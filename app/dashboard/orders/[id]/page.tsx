@@ -1,3 +1,5 @@
+import { createPakasirQris } from "@/lib/pakasir"
+import { createClient as createAdminClient } from "@supabase/supabase-js"
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { cancelOwnOrderAction } from '@/app/actions/orders'
@@ -17,6 +19,35 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
   const { data } = await supabase.from('orders').select('*, order_items(*, products(name))').eq('id', id).eq('user_id', user!.id).single()
   if (!data) notFound()
   const o = data as Order
+
+  let qrisError: string | null = null
+  if (!o.qris_string && o.payment_method !== 'cod' && o.payment_status === 'unpaid') {
+    try {
+      const q = await createPakasirQris({
+        orderId: o.invoice_code,
+        amount: Number(o.total_amount),
+      })
+      o.qris_string = q.qrisString
+      o.gateway_ref = q.gatewayRef
+      o.qris_total = q.totalPayment
+      o.qris_expires_at = q.expiresAt
+
+      if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        const admin = createAdminClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY
+        )
+        await admin.from('orders').update({
+          qris_string: q.qrisString,
+          gateway_ref: q.gatewayRef,
+          qris_total: q.totalPayment,
+          qris_expires_at: q.expiresAt,
+        }).eq('id', o.id)
+      }
+    } catch (e: unknown) {
+      qrisError = e instanceof Error ? e.message : String(e)
+    }
+  }
 
   let proofUrl: string | null = null
   if (o.payment_proof_url) {
@@ -78,7 +109,9 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             <div className="mt-3">
               {o.payment_status === 'verifying' && <p className="mb-3 rounded-xl bg-kunyit-soft px-3 py-3 text-sm text-kunyit">Bukti pembayaran sedang diperiksa admin. Anda masih bisa mengirim ulang jika salah foto.</p>}
               <p className="text-sm">Transfer tepat <b>{rupiah(o.total_amount)}</b> lewat QRIS atau rekening berikut:</p>
-              {o.qris_string ? (
+              {qrisError && <p className="my-2 rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600">Info QRIS: {qrisError}</p>}
+                  {qrisError && <p className="my-2 rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600">Info QRIS: {qrisError}</p>}
+                  {o.qris_string ? (
                     <div className="my-3 rounded-xl border border-line bg-white p-4 text-center">
                       <p className="text-xs font-semibold uppercase tracking-wide text-river">QRIS Otomatis (Verifikasi Instan)</p>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
