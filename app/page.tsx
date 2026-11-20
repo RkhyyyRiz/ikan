@@ -32,16 +32,7 @@ export default async function HomePage() {
     <>
       <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-md items-center justify-between px-5 pb-2 pt-4 sm:max-w-3xl">
-          <button
-            type="button"
-            onClick={() => window.dispatchEvent(new Event('open-vibe-menu'))}
-            aria-label="Buka Menu"
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-line/80 bg-white text-ink shadow-xs transition duration-200 hover:scale-105 hover:bg-river-soft active:scale-95"
-          >
-            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-              <path d="M4 7h16M4 12h11M4 17h16" />
-            </svg>
-          </button>
+          <div className="h-10 w-10" aria-hidden="true" />
 
           <div className="text-center">
             <span className="font-display text-sm font-extrabold tracking-tight text-ink">

@@ -202,6 +202,25 @@ export default function Storefront({
         </div>
       )}
 
+      
+      {/* Tombol Buka Slide Menu Kiri Atas */}
+      <div className="mb-3 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => setMenuOpen(true)}
+          aria-label="Buka Menu"
+          className="flex h-10 items-center gap-2 rounded-xl border border-line/80 bg-white px-3 text-xs font-bold text-ink shadow-xs transition duration-200 hover:scale-105 hover:bg-river-soft active:scale-95"
+        >
+          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+            <path d="M4 7h16M4 12h11M4 17h16" />
+          </svg>
+          <span>Menu</span>
+        </button>
+        <span className="rounded-full bg-[#EAF6F0] px-3 py-1 text-[11px] font-bold text-[#124E3B]">
+          Mode {roleLabel}
+        </span>
+      </div>
+
       {/* Swipeable Hero Banner (Bisa Digeser Touch / Klik Indikator) */}
       <section
         onTouchStart={(e) => {
