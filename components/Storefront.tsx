@@ -708,9 +708,12 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
         </div>
       </section>
 
+      {/* Spacer Bawah Anti-Tabrak */}
+      <div className={cart.length > 0 ? "h-44" : "h-28"} aria-hidden="true" />
+
       {/* Floating Cart Bar */}
       {cart.length > 0 && (
-        <div className="fixed inset-x-0 bottom-20 z-40 mx-auto max-w-md px-5 sm:max-w-3xl">
+        <div className="fixed inset-x-0 bottom-28 z-40 mx-auto max-w-md px-5 sm:max-w-3xl">
           <button
             type="button"
             onClick={() => setCartOpen(true)}
@@ -846,7 +849,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
               <div
                 className={`flex items-center justify-center transition-all duration-300 ${
                   activeNav === "home"
-                    ? "-mt-7 h-13 w-13 rounded-full border-4 border-[#124E3B] bg-white text-[#124E3B] shadow-md"
+                    ? "-mt-8 h-14 w-14 rounded-full border-[4px] border-[#124E3B] bg-white text-[#124E3B] shadow-lg"
                     : "h-9 w-9 text-ink/45 group-hover:text-[#124E3B]"
                 }`}
               >
