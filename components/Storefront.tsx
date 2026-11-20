@@ -83,6 +83,42 @@ export default function Storefront({
 
   return (
     <>
+            {/* Delivery Area & Quick Tags (Ala Referensi Delivery, Warna Tetap Hijau-Mint) */}
+      <div className="mb-4 flex items-center justify-between rounded-2xl border border-line/80 bg-[#F6FBF8] px-3.5 py-2 text-xs">
+        <div className="flex items-center gap-1.5 font-semibold text-ink">
+          <span className="h-2 w-2 rounded-full bg-[#15803D]" />
+          <span>Pengiriman Area Kalbar • Segar Harian</span>
+        </div>
+        <span className="font-bold text-[#124E3B]">0.5 kg+</span>
+      </div>
+
+      <div className="mb-4 flex items-center gap-1.5 overflow-x-auto pb-1">
+        {['Nila', 'Patin', 'Lele', 'Gurame', 'Hidup', 'Bersih', 'Grosir'].map((tag) => {
+          const active = search.toLowerCase() === tag.toLowerCase()
+          return (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => {
+                if (tag === 'Grosir') {
+                  setTab(tab === 'wholesale' ? 'all' : 'wholesale')
+                  return
+                }
+                setSearch(active ? '' : tag)
+                setShowSearch(true)
+              }}
+              className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-bold transition ${
+                active || (tag === 'Grosir' && tab === 'wholesale')
+                  ? 'bg-[#124E3B] text-white'
+                  : 'bg-[#EAF6F0] text-[#124E3B] hover:bg-[#124E3B]/15'
+              }`}
+            >
+              #{tag}
+            </button>
+          )
+        })}
+      </div>
+
       {/* Squircle Category Bar (Persis Referensi) */}
       <div className="mb-6 flex items-center justify-between gap-2">
         {categories.map((c) => {
