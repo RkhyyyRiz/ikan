@@ -32,7 +32,7 @@ export default function RegisterPage() {
 
   return (
     <AuthShell title="Buat akun" subtitle="Daftar untuk memesan ikan segar. Kode verifikasi 6 digit dikirim ke email Anda.">
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-4 bdik-auth-stagger">
         <div><label className="label" htmlFor="name">Nama Lengkap</label>
           <input id="name" className="input" required autoComplete="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
         <div><label className="label" htmlFor="email">Email</label>

@@ -60,7 +60,7 @@ export default function VerifyForm() {
 
   return (
     <AuthShell title="Masukkan kode verifikasi" subtitle={`Kami mengirim kode 6 digit ke ${email}.`}>
-      <form onSubmit={verify} className="space-y-5">
+      <form onSubmit={verify} className="space-y-5 bdik-auth-stagger">
         <div className="flex justify-between gap-2">
           {digits.map((d, i) => (
             <input key={i} ref={(el) => { refs.current[i] = el }} value={d} inputMode="numeric" autoComplete={i === 0 ? 'one-time-code' : 'off'}

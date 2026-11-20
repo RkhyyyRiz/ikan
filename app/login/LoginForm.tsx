@@ -33,7 +33,7 @@ export default function LoginForm() {
 
   return (
     <AuthShell title="Masuk" subtitle="Masuk untuk memesan dan memantau pesanan Anda.">
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-4 bdik-auth-stagger">
         <div><label className="label" htmlFor="email">Email</label>
           <input id="email" type="email" className="input" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
         <div><label className="label" htmlFor="password">Kata Sandi</label>

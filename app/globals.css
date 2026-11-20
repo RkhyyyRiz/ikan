@@ -227,3 +227,78 @@ button, a, select, input, textarea, [role="button"] {
     transition: none !important;
   }
 }
+
+/* === Auth & Dashboard Match CSS === */
+@keyframes bdikFadeRise {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bdik-auth-card {
+  animation: bdikFadeRise 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.bdik-auth-stagger > * {
+  opacity: 0;
+  animation: bdikFadeRise 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.bdik-auth-stagger > *:nth-child(1) { animation-delay: 40ms; }
+.bdik-auth-stagger > *:nth-child(2) { animation-delay: 85ms; }
+.bdik-auth-stagger > *:nth-child(3) { animation-delay: 130ms; }
+.bdik-auth-stagger > *:nth-child(4) { animation-delay: 175ms; }
+.bdik-auth-stagger > *:nth-child(5) { animation-delay: 220ms; }
+
+.bdik-auth-card input {
+  transition: border-color 160ms ease, box-shadow 180ms ease, background-color 160ms ease;
+}
+.bdik-auth-card input:focus {
+  outline: none;
+  border-color: #115548;
+  box-shadow: 0 0 0 3px rgba(17, 85, 72, 0.14);
+}
+
+.bdik-auth-card button,
+.bdik-auth-card .btn-primary {
+  transition: transform 130ms cubic-bezier(0.22, 1, 0.36, 1), filter 160ms ease, box-shadow 160ms ease;
+}
+.bdik-auth-card button:active,
+.bdik-auth-card .btn-primary:active {
+  transform: scale(0.975);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bdik-auth-card,
+  .bdik-auth-stagger > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .bdik-auth-card input,
+  .bdik-auth-card button,
+  .bdik-auth-card .btn-primary {
+    transition: none !important;
+  }
+}
+
+.bdik-auth-stagger input {
+  transition: border-color 160ms ease, box-shadow 180ms ease, background-color 160ms ease;
+}
+.bdik-auth-stagger input:focus {
+  outline: none;
+  border-color: #115548;
+  box-shadow: 0 0 0 3px rgba(17, 85, 72, 0.14);
+}
+.bdik-auth-stagger button,
+.bdik-auth-stagger .btn-primary {
+  transition: transform 130ms cubic-bezier(0.22, 1, 0.36, 1), filter 160ms ease, box-shadow 160ms ease;
+}
+.bdik-auth-stagger button:active,
+.bdik-auth-stagger .btn-primary:active {
+  transform: scale(0.975);
+}
