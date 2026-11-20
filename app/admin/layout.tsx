@@ -12,9 +12,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login?next=/admin')
   const adminDb = createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-  const { data: profile } = await adminDb.from("profiles").select("role").eq("id", user.id).single()
-  console.log("ADMIN_DEBUG:", { userId: user.id, profile, err: null });
-  console.log("ADMIN_DEBUG:", { userId: user.id, profile, err: null });
+  const { data: profile, error: profileErr } = await adminDb.from("profiles").select("role").eq("id", user.id).single()
+  console.log("ADMIN_DEBUG_V2:", { userId: user?.id ?? null, profile, profileErr });
   if (profile?.role !== 'admin') redirect('/dashboard')
 
   return (
