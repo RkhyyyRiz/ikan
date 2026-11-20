@@ -130,3 +130,21 @@
     border-color: rgba(52, 211, 153, 0.25) !important;
   }
 }
+
+
+/* === ANTI ZOOM & DOUBLE-TAP ZOOM DI IOS/ANDROID === */
+html, body {
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior-x: none;
+}
+
+button, a, select, input, textarea, [role="button"] {
+  touch-action: manipulation;
+}
+
+@media screen and (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}

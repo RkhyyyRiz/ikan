@@ -728,7 +728,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
                           src={item.image_url}
                           alt={item.name}
                           loading="lazy"
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="h-full w-full object-cover "
                         />
                       ) : (
                         <div className="flex h-full w-full flex-col items-center justify-center text-[#124E3B]/70">
