@@ -12,6 +12,7 @@ const ADVANCE_LABEL: Partial<Record<OrderStatus, string>> = {
 }
 
 export default function AdminOrderCard({ order: o, proofUrl }: { order: Order & { profiles: { full_name: string; phone: string | null } | null }; proofUrl: string | null }) {
+  const router = useRouter();
   const onCancelOrder = async (orderId: string) => {
     if (!window.confirm("Yakin ingin membatalkan pesanan ini?")) return;
     try {
