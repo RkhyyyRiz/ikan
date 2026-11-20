@@ -141,7 +141,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       {o.order_status === 'pending' && o.payment_status === 'unpaid' && (
         <form action={cancelOwnOrderAction}>
           <input type="hidden" name="order_id" value={o.id} />
-          <button className="btn-danger w-full" type="button" onClick={() => onCancelOrder(l.id)}>Batalkan Pesanan</button>
+          <button className="btn-danger w-full"  type="submit">Batalkan Pesanan</button>
         </form>
       )}
     </>
