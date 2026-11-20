@@ -11,7 +11,7 @@ export default async function AdminHome() {
     supabase.rpc('field_prep_summary'),
   ])
   const rows = (prep ?? []) as { product_name: string; processing_option: ProcessingOption; total_kg: number }[]
-  const totalKg = rows.reduce((s, r) => s + Number(r.total_kg), 0)
+  const totalkg = rows.reduce((s, r) => s + Number(r.total_kg), 0)
 
   const cards = [
     { label: 'Total Omzet Lunas', value: rupiah(stats?.revenue_paid ?? 0) },
@@ -31,7 +31,7 @@ export default async function AdminHome() {
       <section className="card mt-6 p-4">
         <div className="flex items-baseline justify-between">
           <h2 className="text-lg font-bold">Rekap Persiapan Lapangan Hari Ini</h2>
-          {rows.length > 0 && <p className="text-sm text-mute">Total {kg(totalKg)}</p>}
+          {rows.length > 0 && <p className="text-sm text-mute">Total {kg(totalkg)}</p>}
         </div>
         <p className="mb-3 text-sm text-mute">Jumlah yang perlu dipanen dan diolah dari pesanan berstatus Menunggu Konfirmasi dan Disiapkan.</p>
         {rows.length === 0 ? (

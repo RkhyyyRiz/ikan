@@ -1,7 +1,7 @@
 import type { OrderStatus, PaymentStatus, ProcessingOption, Product } from './types'
 
 export const rupiah = (n: number) => `Rp ${Math.round(Number(n)).toLocaleString('id-ID')}`
-export const kg = (n: number | string) => `${Number(n).toLocaleString('id-ID', { maximumFractionDigits: 2 })} kg`
+export const kg = (n: number | string) => `${Number(n).toLocaleString('id-ID', { maximumFractionDigits: 2 })}/ kg`
 export const tanggal = (iso: string) =>
   new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
 export const tanggalWaktu = (iso: string) =>

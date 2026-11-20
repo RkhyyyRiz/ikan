@@ -10,7 +10,7 @@
     @apply font-display tracking-tight text-ink;
   }
   :focus-visible {
-    outline: 2px solid #0B1F65;
+    outline: 2px solid #115548;
     outline-offset: 2px;
   }
 }
@@ -100,10 +100,10 @@
   }
   body {
     background-color: #0B1410 !important;
-    color: #EAF4FE !important;
+    color: #f3f7f5 !important;
   }
   h1, h2, h3, h4, .text-ink {
-    color: #EAF4FE !important;
+    color: #f3f7f5 !important;
   }
   .text-mute, .text-ink\/80, .text-ink\/75, .text-ink\/70, .text-ink\/65, .text-ink\/60, .text-ink\/55, .text-ink\/45 {
     color: #9CA3AF !important;
@@ -126,7 +126,7 @@
   }
   input, select, textarea {
     background-color: #0E1914 !important;
-    color: #EAF4FE !important;
+    color: #f3f7f5 !important;
     border-color: rgba(52, 211, 153, 0.25) !important;
   }
 }
@@ -259,7 +259,7 @@ button, a, select, input, textarea, [role="button"] {
 }
 .bdik-auth-card input:focus {
   outline: none;
-  border-color: #0B1F65;
+  border-color: #115548;
   box-shadow: 0 0 0 3px rgba(17, 85, 72, 0.14);
 }
 
@@ -291,7 +291,7 @@ button, a, select, input, textarea, [role="button"] {
 }
 .bdik-auth-stagger input:focus {
   outline: none;
-  border-color: #0B1F65;
+  border-color: #115548;
   box-shadow: 0 0 0 3px rgba(17, 85, 72, 0.14);
 }
 .bdik-auth-stagger button,
@@ -307,11 +307,11 @@ button, a, select, input, textarea, [role="button"] {
 :root {
   /* Colors */
   --color-gallery-white: #ffffff;
-  --color-studio-mist: #EAF4FE;
+  --color-studio-mist: #f3f7f5;
   --color-paper-frost: #fafafc;
   --color-hairline-silver: #d6d6d6;
   --color-control-gray: #e6e6e8;
-  --color-ink: #0B1F65;
+  --color-ink: #115548;
   --color-slate: #707070;
   --color-steel: #86868b;
   --color-apple-blue: #0066cc;
@@ -410,7 +410,7 @@ button, a, select, input, textarea, [role="button"] {
 
   /* Surfaces */
   --surface-gallery-white: #ffffff;
-  --surface-studio-mist: #EAF4FE;
+  --surface-studio-mist: #f3f7f5;
   --surface-paper-frost: #fafafc;
   --surface-control-gray: #e6e6e8;
 }
@@ -429,7 +429,7 @@ button, a, select, input, textarea, [role="button"] {
 
 .bdik-auth-stagger input {
   background-color: var(--surface-paper-frost, #fafafc);
-  color: var(--color-ink, #0B1F65);
+  color: var(--color-ink, #115548);
   border: 1px solid var(--color-hairline-silver, #d6d6d6);
   border-radius: var(--radius-lg, 10px);
   font-family: var(--font-sf-pro-text);
@@ -442,7 +442,7 @@ button, a, select, input, textarea, [role="button"] {
 
 .bdik-auth-stagger input:focus {
   background-color: var(--color-gallery-white, #ffffff);
-  border-color: #0B1F65;
+  border-color: #115548;
   box-shadow: 0 0 0 3px rgba(17, 85, 72, 0.16);
 }
 
@@ -461,9 +461,9 @@ button, a, select, input, textarea, [role="button"] {
 .nav-skeleton {
   background: linear-gradient(
     90deg,
-    var(--surface-studio-mist, #EAF4FE) 25%,
+    var(--surface-studio-mist, #f3f7f5) 25%,
     var(--surface-control-gray, #e6e6e8) 50%,
-    var(--surface-studio-mist, #EAF4FE) 75%
+    var(--surface-studio-mist, #f3f7f5) 75%
   );
   background-size: 200% 100%;
   animation: navShimmer 1.2s ease-in-out infinite;
@@ -472,11 +472,11 @@ button, a, select, input, textarea, [role="button"] {
 /* === Full JSON Design Tokens & Typography === */
 :root {
   --color-gallery-white: #ffffff;
-  --color-studio-mist: #EAF4FE;
+  --color-studio-mist: #f3f7f5;
   --color-paper-frost: #fafafc;
   --color-hairline-silver: #d6d6d6;
   --color-control-gray: #e6e6e8;
-  --color-ink: #0B1F65;
+  --color-ink: #115548;
   --color-slate: #707070;
   --color-steel: #86868b;
   --color-apple-blue: #0066cc;
@@ -516,7 +516,7 @@ button, a, select, input, textarea, [role="button"] {
   --shadow-subtle: rgb(230, 230, 232) 0px 0px 0px 1px;
   --shadow-subtle-2: rgb(134, 134, 139) 0px 0px 0px 1px;
   --surface-gallery-white: #ffffff;
-  --surface-studio-mist: #EAF4FE;
+  --surface-studio-mist: #f3f7f5;
   --surface-paper-frost: #fafafc;
   --surface-control-gray: #e6e6e8;
   --typo-xs-ff: var(--font-sf-pro-text);
@@ -738,7 +738,7 @@ button, a, select, input, textarea, [role="button"] {
 
 .bdik-auth-stagger input:focus {
   background-color: var(--surface-gallery-white);
-  border-color: #0B1F65;
+  border-color: #115548;
   box-shadow: 0 0 0 3px rgba(17, 85, 72, 0.16);
 }
 
@@ -753,11 +753,11 @@ button, a, select, input, textarea, [role="button"] {
 @theme {
   /* Colors */
   --color-gallery-white: #ffffff;
-  --color-studio-mist: #EAF4FE;
+  --color-studio-mist: #f3f7f5;
   --color-paper-frost: #fafafc;
   --color-hairline-silver: #d6d6d6;
   --color-control-gray: #e6e6e8;
-  --color-ink: #0B1F65;
+  --color-ink: #115548;
   --color-slate: #707070;
   --color-steel: #86868b;
   --color-apple-blue: #0066cc;
@@ -834,113 +834,10 @@ button, a, select, input, textarea, [role="button"] {
   --shadow-subtle-2: rgb(134, 134, 139) 0px 0px 0px 1px;
 }
 
-/* === Cobalt & Sky Blue Brand Storefront Theme === */
-:root {
-  --brand-navy: #0B1F65;
-  --brand-cobalt: #1976D2;
-  --brand-sky: #5BB5F5;
-  --brand-ice: #EAF4FE;
-}
-
+/* === Budidaya Ikan Kalbar Clean Theme & Bottom Nav Alignment === */
 body {
-  background: linear-gradient(180deg, #1976D2 0%, #2484DE 38%, #5BB5F5 100%) !important;
-  background-attachment: fixed !important;
-  color: #ffffff !important;
-  min-height: 100vh;
-}
-
-/* Pastikan kontainer halaman utama transparan terhadap gradasi biru */
-body > div,
-main {
-  background-color: transparent !important;
-}
-
-/* Header & judul utama kontras putih bersih di atas latar Cobalt */
-header,
-header h1,
-header h2,
-header span,
-main > div > h1,
-main > div > h2 {
-  color: #ffffff;
-}
-
-/* Kartu produk & panel konten menjadi putih membulat khas referensi */
-article,
-[class*="card" i],
-[class*="Card" i],
-.bg-white,
-.bg-gallery-white {
-  background-color: #ffffff !important;
-  color: #0B1F65 !important;
-  border-radius: 28px !important;
-  border: 1px solid rgba(255, 255, 255, 0.7) !important;
-  box-shadow: 0 18px 38px -14px rgba(11, 31, 101, 0.28) !important;
-}
-
-/* Teks di dalam kartu putih tetap gelap & tajam terbaca */
-article h2,
-article h3,
-article p,
-article span,
-[class*="card" i] h2,
-[class*="card" i] h3,
-[class*="card" i] p,
-.bg-white h2,
-.bg-white h3,
-.bg-white p {
-  color: #0B1F65;
-}
-
-/* Efek gambar produk menonjol sedikit ke atas pada kartu */
-article img,
-[class*="card" i] img {
-  transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1) !important;
-}
-
-article:hover img,
-[class*="card" i]:hover img {
-  transform: translateY(-6px) scale(1.03) !important;
-}
-
-/* Drawer / Sidebar Menu bergaya Deep Navy */
-aside,
-[role="dialog"],
-[class*="drawer" i],
-[class*="sidebar" i] {
-  background-color: #0B1F65 !important;
-  color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.14) !important;
-}
-
-aside a,
-aside button,
-aside span,
-aside p,
-aside h2,
-aside h3,
-[role="dialog"] a,
-[role="dialog"] button {
-  color: #ffffff;
-}
-
-/* Tombol aksi utama kapsul Deep Navy */
-button[class*="bg-blue-"],
-button[class*="bg-[#0B1F65]"],
-button[class*="bg-neutral-900"] {
-  background-color: #0B1F65 !important;
-  color: #ffffff !important;
-  border-radius: 9999px !important;
-  box-shadow: 0 8px 20px -6px rgba(11, 31, 101, 0.45) !important;
-}
-
-/* Bottom Navigation bersih, mengambang membulat, dan sejajar */
-nav.fixed.bottom-0,
-[class*="bottom-0"] nav {
-  background: rgba(255, 255, 255, 0.96) !important;
-  backdrop-filter: blur(14px) !important;
-  border-top: 1px solid rgba(11, 31, 101, 0.08) !important;
-  box-shadow: 0 -10px 30px rgba(11, 31, 101, 0.14) !important;
+  background-color: #f3f7f5;
+  color: #111827;
 }
 
 nav.fixed.bottom-0 a,
@@ -952,7 +849,6 @@ nav.fixed.bottom-0 button,
   align-items: center !important;
   justify-content: center !important;
   gap: 4px !important;
-  color: #0B1F65 !important;
   transform: none !important;
 }
 

@@ -10,7 +10,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { ProcessingOption, PaymentMethod } from '@/lib/types'
 
 export interface OrderInput {
-  productId: string; weightKg: number; processing: ProcessingOption; payment: PaymentMethod
+  productId: string; weightkg: number; processing: ProcessingOption; payment: PaymentMethod
   phone: string; address: string; notes: string
 }
 
@@ -27,7 +27,7 @@ export async function createOrderAction(input: OrderInput): Promise<{ error: str
   if (address.length < 8) return { error: 'Alamat pengiriman wajib diisi lengkap.' }
 
   const { data: id, error } = await supabase.rpc('create_fish_order', {
-    p_product_id: input.productId, p_weight_kg: input.weightKg, p_processing_option: input.processing,
+    p_product_id: input.productId, p_weight_kg: input.weightkg, p_processing_option: input.processing,
     p_payment_method: input.payment, p_delivery_address: address, p_delivery_notes: input.notes.trim() || null,
   })
   if (error || !id) return { error: cleanMsg(error?.message ?? 'Pesanan gagal dibuat. Coba lagi.') }

@@ -16,8 +16,8 @@ function StockEditor({ p }: { p: Product }) {
   return (
     <div>
       <div className="flex items-center gap-2">
-        <input aria-label={`Stok ${p.name} (kg)`} inputMode="decimal" value={val} onChange={(e) => { setVal(e.target.value); setMsg('') }} className="input !w-24 text-center" />
-        <span className="text-sm text-mute">kg</span>
+        <input aria-label={`Stok ${p.name} (/ kg)`} inputMode="decimal" value={val} onChange={(e) => { setVal(e.target.value); setMsg('') }} className="input !w-24 text-center" />
+        <span className="text-sm text-mute">/ kg</span>
         <button disabled={!dirty || pending} className="btn-outline !min-h-[44px]" onClick={() => start(async () => { const r = await updateStockAction(p.id, Number(val.replace(',', '.'))); setMsg(r.error ?? 'Tersimpan') })}>
           {pending ? '…' : 'Simpan'}
         </button>
@@ -57,14 +57,14 @@ function ProductForm({ product, onClose }: { product: Product | null; onClose: (
           <input type="hidden" name="id" value={product?.id ?? ''} />
           <input type="hidden" name="existing_image_url" value={product?.image_url ?? ''} />
           {f('name', 'Nama Ikan', { required: true, defaultValue: product?.name, placeholder: 'Ikan Nila Merah' })}
-          {f('size_spec', 'Ukuran', { required: true, defaultValue: product?.size_spec, placeholder: 'Isi 3-4 ekor/kg' })}
+          {f('size_spec', 'Ukuran', { required: true, defaultValue: product?.size_spec, placeholder: 'Isi 3-4 ekorkg' })}
           <div className="grid grid-cols-2 gap-3">
-            {f('price_per_kg', 'Harga Eceran /kg (Rp)', { required: true, type: 'number', min: 0, defaultValue: product?.price_per_kg })}
-            {f('wholesale_price_per_kg', 'Harga Grosir /kg (Rp)', { type: 'number', min: 0, defaultValue: product?.wholesale_price_per_kg ?? '' })}
-            {f('wholesale_min_kg', 'Minimal Grosir (kg)', { type: 'number', step: '0.5', min: 0.5, defaultValue: product?.wholesale_min_kg ?? 5 })}
-            {f('cleaning_fee_per_kg', 'Biaya Bersihkan /kg (Rp)', { type: 'number', min: 0, defaultValue: product?.cleaning_fee_per_kg ?? 2000 })}
+            {f('price_per_kg', 'Harga Eceran / kg (Rp)', { required: true, type: 'number', min: 0, defaultValue: product?.price_per_kg })}
+            {f('wholesale_price_per_kg', 'Harga Grosir / kg (Rp)', { type: 'number', min: 0, defaultValue: product?.wholesale_price_per_kg ?? '' })}
+            {f('wholesale_min_kg', 'Minimal Grosir (/ kg)', { type: 'number', step: '0.5', min: 0.5, defaultValue: product?.wholesale_min_kg ?? 5 })}
+            {f('cleaning_fee_per_kg', 'Biaya Bersihkan / kg (Rp)', { type: 'number', min: 0, defaultValue: product?.cleaning_fee_per_kg ?? 2000 })}
           </div>
-          {f('stock_kg', 'Stok (kg)', { required: true, type: 'number', step: '0.5', min: 0, defaultValue: product?.stock_kg ?? 0 })}
+          {f('stock_kg', 'Stok (/ kg)', { required: true, type: 'number', step: '0.5', min: 0, defaultValue: product?.stock_kg ?? 0 })}
           <div>
             <label className="label" htmlFor="availability_type">Ketersediaan</label>
             <select id="availability_type" name="availability_type" className="input" value={type} onChange={(e) => setType(e.target.value as 'ready' | 'preorder')}>
@@ -123,8 +123,8 @@ export default function ProductManager({ products }: { products: Product[] }) {
                 : <div className="h-20 w-28 shrink-0 rounded-lg bg-river-soft" />}
               <div className="min-w-0 flex-1">
                 <p className="font-bold">{p.name} <span className="font-normal text-mute">· {p.size_spec}</span></p>
-                <p className="text-sm">{rupiah(p.price_per_kg)}/kg{p.wholesale_price_per_kg != null && <> · grosir ≥ {kg(p.wholesale_min_kg)}: {rupiah(p.wholesale_price_per_kg)}/kg</>}</p>
-                <p className="text-sm text-mute">{p.availability_type === 'preorder' ? `Pre-Order, panen ${p.harvest_date ? tanggal(p.harvest_date) : '-'}` : 'Ready'} · bersihkan {rupiah(p.cleaning_fee_per_kg)}/kg</p>
+                <p className="text-sm">{rupiah(p.price_per_kg)}/ kg{p.wholesale_price_per_kg != null && <> · grosir ≥ {kg(p.wholesale_min_kg)}: {rupiah(p.wholesale_price_per_kg)}/ kg</>}</p>
+                <p className="text-sm text-mute">{p.availability_type === 'preorder' ? `Pre-Order, panen ${p.harvest_date ? tanggal(p.harvest_date) : '-'}` : 'Ready'} · bersihkan {rupiah(p.cleaning_fee_per_kg)}/ kg</p>
               </div>
               <StockEditor key={p.id + p.stock_kg} p={p} />
               <div className="flex gap-2">
