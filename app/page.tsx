@@ -11,7 +11,7 @@ export default async function HomePage() {
   const { data: { user } } = await supabase.auth.getUser()
   const [{ data: products }, { data: profile }] = await Promise.all([
     supabase.from('products').select('*').eq('is_active', true).order('created_at', { ascending: false }),
-    user ? supabase.from('profiles').select('id,full_name,email,phone,address,role').eq('id', user.id).single() : Promise.resolve({ data: null }),
+    user ? supabase.from('profiles').select('id,full_name,email,phone,address,role').eq('id', user.id).maybeSingle() : Promise.resolve({ data: null }),
   ])
   const me = profile as Profile | null
 

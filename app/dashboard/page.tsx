@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { reorderAction } from '@/app/actions/orders'
 import { createClient } from '@/lib/supabase/server'
@@ -11,8 +12,9 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const { error } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  if (!user) { redirect('/login') }
   const [{ data: profile }, { data }] = await Promise.all([
-    supabase.from('profiles').select('full_name').eq('id', user!.id).single(),
+    supabase.from('profiles').select('full_name').eq('id', user!.id).maybeSingle(),
     supabase.from('orders').select('*, order_items(*, products(name))').eq('user_id', user!.id).order('created_at', { ascending: false }),
   ])
   const orders = (data ?? []) as Order[]
