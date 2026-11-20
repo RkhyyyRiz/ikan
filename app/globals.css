@@ -48,3 +48,21 @@
     transition: none !important;
   }
 }
+
+@keyframes vibeFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes vibeFadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-vibe-float {
+  animation: vibeFloat 3.4s ease-in-out infinite;
+}
+
+.animate-vibe-fade-up {
+  animation: vibeFadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
