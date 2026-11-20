@@ -1,5 +1,6 @@
-'use client'
+"use client";
 
+import InstallAppButton from "./InstallAppButton";
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -95,7 +96,8 @@ const NavSvg = ({ name, active }: { name: 'home' | 'search' | 'cart' | 'orders' 
   const fillTone = active ? 'rgba(21, 128, 61, 0.22)' : 'none'
   if (name === 'home') {
     return (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <div className="mb-2 flex justify-end px-4 pt-2"><InstallAppButton /></div>
         <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1v-9.5Z" fill={fillTone} />
       </svg>
     )
