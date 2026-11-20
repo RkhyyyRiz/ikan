@@ -52,11 +52,9 @@ const HERO_SLIDES = [
 
 const TAGS = ['#Nila', '#Patin', '#Lele', '#Gurame', '#Hidup', '#Bersih']
 const PREP_OPTIONS = [
-  { label: 'Utuh Hidup', value: 'utuh_hidup', needsCleaning: false },
+  { label: 'Utuh Hidup', value: 'hidup', needsCleaning: false },
   { label: 'Segar (Es)', value: 'segar_es', needsCleaning: false },
-  { label: 'Bersih Sisik & Insang', value: 'bersih', needsCleaning: true },
-  { label: 'Belah Bakar', value: 'belah_bakar', needsCleaning: true },
-  { label: 'Fillet', value: 'fillet', needsCleaning: true },
+  { label: 'Bersih Siap Masak', value: 'bersih_siap_masak', needsCleaning: true },
 ]
 
 const DEMO_PRODUCTS = [
@@ -356,7 +354,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
 
       const itemsPayload = cart.map((c) => {
         const calc = calcCartLine(c)
-        const prepValue = PREP_OPTIONS.find((p) => p.label === c.prep)?.value || 'utuh_hidup'
+        const prepValue = PREP_OPTIONS.find((p) => p.label === c.prep)?.value || 'hidup'
         return {
           order_id: insertedOrder.id,
           product_id: c.productId,
