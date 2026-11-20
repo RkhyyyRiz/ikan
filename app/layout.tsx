@@ -32,8 +32,8 @@ export const metadata: Metadata = {
     }
   })(),
   title: {
-    default: 'Budi Daya Ikan Kalbar — Ikan Segar Langsung dari Kolam',
-    template: '%s | Budi Daya Ikan Kalbar',
+    default: 'Budidaya Ikan Kalbar — Ikan Segar Langsung dari Kolam',
+    template: '%s | Budidaya Ikan Kalbar',
   },
   description:
     'Beli ikan nila, lele, dan patin segar langsung dari pembudidaya di Kalimantan Barat. Pesan hidup, segar, atau bersih siap masak.',

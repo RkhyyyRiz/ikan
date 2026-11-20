@@ -36,7 +36,7 @@ export default async function HomePage() {
 
           <div className="text-center">
             <span className="font-display text-sm font-extrabold tracking-tight text-ink">
-              Budi Daya Ikan Kalbar
+              Budidaya Ikan Kalbar
             </span>
           </div>
 

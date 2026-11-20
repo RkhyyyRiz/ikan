@@ -1,4 +1,4 @@
-# Budi Daya Ikan Kalbar
+# Budidaya Ikan Kalbar
 
 Toko online ikan budidaya: Next.js 15 (App Router, TypeScript), Tailwind CSS, Supabase (PostgreSQL, Auth OTP email 6 digit, Storage). Siap deploy ke Vercel.
 
@@ -9,7 +9,7 @@ Toko online ikan budidaya: Next.js 15 (App Router, TypeScript), Tailwind CSS, Su
 4. **Authentication → Email Templates → Confirm signup**: ganti isi template dengan kode OTP:
 
    ```html
-   <h2>Kode verifikasi Budi Daya Ikan Kalbar</h2>
+   <h2>Kode verifikasi Budidaya Ikan Kalbar</h2>
    <p>Masukkan kode 6 digit berikut di aplikasi:</p>
    <p style="font-size:28px;font-weight:bold;letter-spacing:6px">{{ .Token }}</p>
    <p>Kode berlaku sebentar. Abaikan email ini jika Anda tidak mendaftar.</p>

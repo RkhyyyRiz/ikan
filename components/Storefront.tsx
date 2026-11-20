@@ -399,7 +399,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
               <div className="flex items-center justify-between border-b border-white/15 pb-4">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-wider text-[#EAF6F0]/75">
-                    Budi Daya Ikan Kalbar
+                    Budidaya Ikan Kalbar
                   </p>
                   <p className="mt-0.5 text-sm font-extrabold text-white">{accountName}</p>
                 </div>
