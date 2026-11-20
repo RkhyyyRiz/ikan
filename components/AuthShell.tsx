@@ -2,7 +2,7 @@ import Logo from './Logo'
 
 export default function AuthShell({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-5 py-8">
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-5 py-8 auth-spring-enter">
       <Logo />
       <div className="mt-10">
         <h1 className="text-2xl font-bold">{title}</h1>
