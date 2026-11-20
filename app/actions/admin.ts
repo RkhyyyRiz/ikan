@@ -13,7 +13,7 @@ async function requireAdmin() {
   const isAdminEmail = String((user as any)?.email ?? "").trim().toLowerCase() === "serahna97@gmail.com";
   const role = data?.role ?? (user as any)?.user_metadata?.role ?? (isAdminEmail ? "admin" : null);
   if (role !== "admin") throw new Error("Khusus admin.")
-  const supabase = createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  return createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
   return createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 }
 const refresh = () => { revalidatePath('/admin', 'layout'); revalidatePath('/') }
