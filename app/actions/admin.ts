@@ -1,6 +1,6 @@
-import { createClient as createAdminClient } from "@supabase/supabase-js"
 'use server'
 
+import { createClient as createAdminClient } from "@supabase/supabase-js"
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import type { OrderStatus } from '@/lib/types'
