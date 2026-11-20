@@ -60,14 +60,14 @@ export default function InstallAppButton({ className = "" }: { className?: strin
       <button
         type="button"
         onClick={handleInstallClick}
-        className={`nav-tap-btn inline-flex items-center gap-1.5 rounded-full bg-[#115548] px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:opacity-95 ${className}`}
+        className={`nav-tap-btn inline-flex items-center gap-1.5 rounded-full bg-[#0B1F65] px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:opacity-95 ${className}`}
       >
         <span>Install App</span>
       </button>
 
       {showIosGuide && (
         <div className="mt-2 w-64 rounded-2xl border border-hairline-silver bg-gallery-white p-3 text-left text-xs text-ink shadow-lg">
-          <p className="font-semibold text-[#115548]">Pasang di Layar Utama</p>
+          <p className="font-semibold text-[#0B1F65]">Pasang di Layar Utama</p>
           <p className="mt-1 text-slate">
             Ketuk tombol <strong>Bagikan / Share</strong> pada browser, lalu pilih{" "}
             <strong>Tambah ke Layar Utama</strong>.

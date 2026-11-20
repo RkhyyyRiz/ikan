@@ -469,7 +469,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
               </nav>
             </div>
 
-            <div className="rounded-xl bg-[#15803D]/55 p-3 text-[11px] leading-relaxed text-[#EAF6F0]">
+            <div className="rounded-xl bg-[#0B1F65]/55 p-3 text-[11px] leading-relaxed text-[#EAF6F0]">
               Tema otomatis menyesuaikan mode terang/gelap HP Anda. Panen Pagi 06.00–09.00 & Panen Sore 15.00–18.00.
             </div>
           </aside>
@@ -494,7 +494,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
           href={dashboardHref}
           className="flex items-center gap-1.5 rounded-full bg-[#EAF6F0] px-3.5 py-1.5 text-[11px] font-extrabold text-[#124E3B] transition-all duration-200 hover:scale-[1.03] active:scale-95"
         >
-          <span className="h-2 w-2 rounded-full bg-[#15803D]" />
+          <span className="h-2 w-2 rounded-full bg-[#0B1F65]" />
           <span>Mode {roleLabel}</span>
         </Link>
       </div>
@@ -511,7 +511,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
           if (diff > 40) setSlideIdx((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)
           touchStartX.current = null
         }}
-        className="relative overflow-hidden rounded-[26px] bg-gradient-to-br from-[#124E3B] via-[#16624A] to-[#15803D] p-5 text-white shadow-lg transition-all duration-500"
+        className="relative overflow-hidden rounded-[26px] bg-gradient-to-br from-[#124E3B] via-[#16624A] to-[#0B1F65] p-5 text-white shadow-lg transition-all duration-500"
       >
         <div key={slideIdx} className="animate-smooth-card flex items-center justify-between gap-4">
           <div className="max-w-[68%]">
@@ -566,8 +566,8 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
       <div className="mt-4 flex items-center justify-between rounded-2xl border border-line/70 bg-white px-4 py-2.5 text-xs shadow-2xs">
         <div className="flex items-center gap-2 font-semibold text-ink">
           <span className="relative flex h-2.5 w-2.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#15803D] opacity-75" />
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#15803D]" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#0B1F65] opacity-75" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#0B1F65]" />
           </span>
           <span>Pengiriman Area Kalbar • Segar Harian</span>
         </div>
@@ -688,7 +688,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
               setActiveTag(null)
               setQuery('')
             }}
-            className="text-xs font-bold text-[#15803D] hover:underline"
+            className="text-xs font-bold text-[#0B1F65] hover:underline"
           >
             Lihat Semua ({filteredProducts.length})
           </button>
@@ -726,7 +726,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
                 <article
                   key={item.id}
                   style={{ animationDelay: `${idx * 55}ms` }}
-                  className="animate-smooth-card group flex flex-col justify-between overflow-hidden rounded-3xl border border-line/75 bg-white shadow-2xs transition-all duration-300 hover:-translate-y-0.5 hover:border-[#15803D]/50 hover:shadow-md nav-page-enter transition duration-200"
+                  className="animate-smooth-card group flex flex-col justify-between overflow-hidden rounded-3xl border border-line/75 bg-white shadow-2xs transition-all duration-300 hover:-translate-y-0.5 hover:border-[#0B1F65]/50 hover:shadow-md nav-page-enter transition duration-200"
                 >
                   <div>
                     {/* Foto Ikan Proporsional di Bagian Atas Kartu */}
@@ -772,8 +772,8 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
                           <svg
                             viewBox="0 0 24 24"
                             className="h-4 w-4"
-                            fill={isFav ? '#15803D' : 'none'}
-                            stroke={isFav ? '#15803D' : '#475569'}
+                            fill={isFav ? '#0B1F65' : 'none'}
+                            stroke={isFav ? '#0B1F65' : '#475569'}
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -806,7 +806,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
                             Opsi Pengolahan:
                           </label>
                           {cleaningFee > 0 && (
-                            <span className="text-[10px] font-semibold text-[#15803D]">
+                            <span className="text-[10px] font-semibold text-[#0B1F65]">
                               +{formatRp(cleaningFee)}/kg (bersih/fillet)
                             </span>
                           )}
@@ -814,7 +814,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
                         <select
                           value={currentPrep}
                           onChange={(e) => setSelectedPrep((p) => ({ ...p, [item.id]: e.target.value }))}
-                          className="mt-1 w-full rounded-xl border border-line bg-[#EAF6F0]/45 px-2.5 py-1.5 text-xs font-semibold text-[#124E3B] outline-none transition focus:border-[#15803D]"
+                          className="mt-1 w-full rounded-xl border border-line bg-[#EAF6F0]/45 px-2.5 py-1.5 text-xs font-semibold text-[#124E3B] outline-none transition focus:border-[#0B1F65]"
                         >
                           {PREP_OPTIONS.map((opt) => (
                             <option key={opt.value} value={opt.label}>
@@ -839,7 +839,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
                       type="button"
                       disabled={stock <= 0}
                       onClick={() => addToCart(item)}
-                      className="rounded-xl bg-[#124E3B] px-3.5 py-2 text-xs font-extrabold !text-white shadow-xs transition-all duration-200 hover:bg-[#15803D] active:scale-95 disabled:opacity-50"
+                      className="rounded-xl bg-[#124E3B] px-3.5 py-2 text-xs font-extrabold !text-white shadow-xs transition-all duration-200 hover:bg-[#0B1F65] active:scale-95 disabled:opacity-50"
                     >
                       {stock > 0 ? '+ Keranjang' : 'Stok Habis'}
                     </button>
@@ -869,7 +869,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
           </div>
           <Link
             href={dashboardHref}
-            className="shrink-0 rounded-xl bg-[#124E3B] px-3.5 py-2 text-xs font-extrabold !text-white transition-transform duration-200 hover:scale-105 hover:bg-[#15803D]"
+            className="shrink-0 rounded-xl bg-[#124E3B] px-3.5 py-2 text-xs font-extrabold !text-white transition-transform duration-200 hover:scale-105 hover:bg-[#0B1F65]"
           >
             {loggedIn ? 'Buka Panel' : 'Masuk'}
           </Link>
@@ -885,7 +885,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
           <button
             type="button"
             onClick={() => setCartOpen(true)}
-            className="flex w-full items-center justify-between rounded-2xl bg-[#124E3B] px-4 py-3 !text-white shadow-xl transition-all duration-200 hover:bg-[#15803D] active:scale-[0.99]"
+            className="flex w-full items-center justify-between rounded-2xl bg-[#124E3B] px-4 py-3 !text-white shadow-xl transition-all duration-200 hover:bg-[#0B1F65] active:scale-[0.99]"
           >
             <div className="text-left">
               <p className="text-[11px] font-semibold text-[#EAF6F0]">
@@ -942,7 +942,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
                       <div key={c.key} className="flex items-center justify-between rounded-2xl border border-line/70 p-3">
                         <div>
                           <p className="text-xs font-extrabold text-ink">{c.name}</p>
-                          <p className="text-[11px] font-semibold text-[#15803D]">
+                          <p className="text-[11px] font-semibold text-[#0B1F65]">
                             {c.prep}
                             {line.isWholesale ? ' • Harga Grosir' : ''}
                             {line.cleaningFee > 0 ? ` (+${formatRp(line.cleaningFee)}/kg)` : ''}
@@ -1044,7 +1044,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
                     type="button"
                     disabled={submitting || cart.length === 0}
                     onClick={handleCheckoutWeb}
-                    className="rounded-2xl bg-[#124E3B] px-5 py-3 text-xs font-extrabold !text-white shadow-md transition-all duration-200 hover:bg-[#15803D] active:scale-95 disabled:opacity-50 nav-tap-btn transition duration-150"
+                    className="rounded-2xl bg-[#124E3B] px-5 py-3 text-xs font-extrabold !text-white shadow-md transition-all duration-200 hover:bg-[#0B1F65] active:scale-95 disabled:opacity-50 nav-tap-btn transition duration-150"
                   >
                     {submitting ? 'Menyimpan...' : 'Buat Pesanan Sekarang'}
                   </button>
@@ -1135,7 +1135,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
               >
                 <NavSvg name="cart" active={activeNav === 'cart'} />
                 {cart.length > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#15803D] px-1 text-[9px] font-extrabold !text-white">
+                  <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#0B1F65] px-1 text-[9px] font-extrabold !text-white">
                     {cart.length}
                   </span>
                 )}

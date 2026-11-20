@@ -78,7 +78,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       <div className="mb-5 rounded-[24px] border border-line bg-[#F6FBF8] p-4">
         <div className="flex items-center justify-between">
           <span className="text-xs font-extrabold text-[#124E3B]">Alur Pesanan Ikan</span>
-          <Link href="/" className="text-xs font-bold text-[#15803D] hover:underline">+ Pesan Lagi</Link>
+          <Link href="/" className="text-xs font-bold text-[#0B1F65] hover:underline">+ Pesan Lagi</Link>
         </div>
         <div className="mt-3 grid grid-cols-4 gap-1.5 text-center text-[10px] font-bold">
           <div className="rounded-xl bg-[#EAF6F0] px-2 py-2 text-[#124E3B]">1. Dibuat</div>

@@ -56,7 +56,7 @@ export default function OrderDrawer({ product: p, profile, loggedIn, onClose }: 
             type="button"
             onClick={onClose}
             aria-label="Kembali"
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink shadow-sm transition hover:bg-emerald-50 active:scale-95"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink shadow-sm transition hover:bg-sky-100 active:scale-95"
           >
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
               <path d="m15 18-6-6 6-6" />
@@ -71,7 +71,7 @@ export default function OrderDrawer({ product: p, profile, loggedIn, onClose }: 
             type="button"
             onClick={onClose}
             aria-label="Tutup"
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink shadow-sm transition hover:bg-emerald-50"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink shadow-sm transition hover:bg-sky-100"
           >
             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
               <path d="M18 6 6 18M6 6l12 12" />
@@ -87,7 +87,7 @@ export default function OrderDrawer({ product: p, profile, loggedIn, onClose }: 
             {/* Floating Price Card di Kiri */}
             <div className="absolute bottom-0 left-0 z-10 rounded-2xl bg-white px-4 py-3 shadow-md shadow-black/5">
               <span className="block text-[11px] font-semibold text-mute">Harga / kg</span>
-              <span className="font-display text-xl font-extrabold text-[#15803D]">
+              <span className="font-display text-xl font-extrabold text-[#0B1F65]">
                 {rupiah(line.unit)}
               </span>
             </div>
@@ -117,7 +117,7 @@ export default function OrderDrawer({ product: p, profile, loggedIn, onClose }: 
         <div className="flex items-center justify-between">
           <h3 className="font-display text-base font-extrabold text-ink">Pilih Kondisi Ikan</h3>
           {line.wholesale && (
-            <span className="rounded-full bg-river-soft px-2.5 py-0.5 text-[11px] font-bold text-[#15803D]">
+            <span className="rounded-full bg-river-soft px-2.5 py-0.5 text-[11px] font-bold text-[#0B1F65]">
               Harga Grosir Aktif!
             </span>
           )}
@@ -141,7 +141,7 @@ export default function OrderDrawer({ product: p, profile, loggedIn, onClose }: 
                 <span className="block text-xs font-extrabold capitalize">
                   {opt.key === 'hidup' ? 'Hidup' : opt.key === 'segar_es' ? 'Segar Es' : 'Bersih'}
                 </span>
-                <span className={`mt-0.5 block text-[10px] leading-tight ${active ? 'text-emerald-100' : 'text-mute'}`}>
+                <span className={`mt-0.5 block text-[10px] leading-tight ${active ? 'text-sky-100' : 'text-mute'}`}>
                   {opt.desc}
                 </span>
               </button>
@@ -154,7 +154,7 @@ export default function OrderDrawer({ product: p, profile, loggedIn, onClose }: 
           <div className="flex items-center justify-between">
             <label className="font-display text-sm font-extrabold text-ink">Pilih Berat (kg)</label>
             {toWholesale > 0 && (
-              <span className="text-[11px] font-semibold text-[#15803D]">
+              <span className="text-[11px] font-semibold text-[#0B1F65]">
                 +{kg(toWholesale)} lagi dapat harga grosir
               </span>
             )}
