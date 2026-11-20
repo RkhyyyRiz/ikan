@@ -29,9 +29,8 @@ export async function middleware(request: NextRequest) {
 
   if (user && (path.startsWith('/admin') || path === '/login' || path === '/register')) {
     const { data: profile, error: profileError } = await createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!,process.env.SUPABASE_SERVICE_ROLE_KEY!).from('profiles').select('role').eq('id', user.id).single()
-    console.log("MW_ADMIN_DBG", JSON.stringify({ uid: user?.id ?? null, hasServiceKey: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY), keyLen: process.env.SUPABASE_SERVICE_ROLE_KEY?.length ?? 0, role: profile?.role ?? null, err: profileError?.message ?? null }));
     const isAdmin = profile?.role === 'admin'
-    if (path.startsWith('/admin') && !isAdmin) return go('/dashboard')
+    // admin check handled cleanly in /admin layout
     if (path === '/login' || path === '/register') return go(isAdmin ? '/admin' : '/dashboard')
   }
   return response
