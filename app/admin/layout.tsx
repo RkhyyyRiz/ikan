@@ -13,6 +13,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!user) redirect('/login?next=/admin')
   const adminDb = createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
   const { data: profile } = await adminDb.from("profiles").select("role").eq("id", user.id).single()
+  console.log("ADMIN_DEBUG:", { userId: user.id, profile, err: null });
   if (profile?.role !== 'admin') redirect('/dashboard')
 
   return (
