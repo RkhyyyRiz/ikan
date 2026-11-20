@@ -61,11 +61,11 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       <div className="mb-4 flex items-center justify-between rounded-2xl bg-[#EAF6F0] px-4 py-3 text-xs">
         <div>
           <span className="font-extrabold uppercase tracking-wide text-[#124E3B]">
-            Akun {profile?.role === 'admin' ? 'Admin' : 'Buyer'}
+            Akun {(profile as { role?: string } | null)?.role === 'admin' ? 'Admin' : 'Buyer'}
           </span>
           <p className="font-bold text-ink">{profile?.full_name || user.email || 'Pengguna Aktif'}</p>
         </div>
-        {profile?.role === 'admin' && (
+        {(profile as { role?: string } | null)?.role === 'admin' && (
           <Link href="/admin" className="rounded-full bg-[#124E3B] px-3 py-1.5 text-[11px] font-bold text-white">
             Panel Admin
           </Link>
