@@ -168,6 +168,13 @@ const CatSvg = ({ id }: { id: string }) => {
 }
 
 export default function Storefront({ products, profile, loggedIn }: StorefrontProps) {
+  const router = useRouter();
+  const [pendingNav, setPendingNav] = useState<string | null>(null);
+
+  useEffect(() => {
+    router.prefetch("/admin");
+    router.prefetch("/orders");
+  }, [router]);
   const router = useRouter()
   const [activeNav, setActiveNav] = useState<'home' | 'search' | 'cart' | 'orders' | 'profile'>('home')
   const [showSearch, setShowSearch] = useState(false)
