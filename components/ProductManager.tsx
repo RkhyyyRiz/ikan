@@ -1,5 +1,6 @@
-import { createClient } from "@/lib/supabase/client";
 'use client'
+
+import { createClient } from "@/lib/supabase/client";
 
 import { useState, useTransition } from 'react'
 import { saveProductAction, toggleActiveAction, updateStockAction } from '@/app/actions/admin'
