@@ -1,3 +1,4 @@
+import { createClient as createAdminClient } from "@supabase/supabase-js"
 'use server'
 
 import { revalidatePath } from 'next/cache'
@@ -8,10 +9,11 @@ async function requireAdmin() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Belum masuk.')
-  const { data } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+  const { data } = await adminDb.from('profiles').select('role').eq('id', user.id).single()
   const isAdminEmail = String((user as any)?.email ?? "").trim().toLowerCase() === "serahna97@gmail.com";
   const role = data?.role ?? (user as any)?.user_metadata?.role ?? (isAdminEmail ? "admin" : null);
   if (role !== "admin") throw new Error("Khusus admin.")
+  const adminDb = createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
   return supabase
 }
 const refresh = () => { revalidatePath('/admin', 'layout'); revalidatePath('/') }
@@ -52,7 +54,7 @@ export async function saveProductAction(formData: FormData): Promise<{ error?: s
     harvest_date: availability === 'preorder' ? harvest : null,
     image_url: imageUrl, is_active: formData.get('is_active') === 'on',
   }
-  const { error } = id ? await supabase.from('products').update(row).eq('id', id) : await supabase.from('products').insert(row)
+  const { error } = id ? await adminDb.from('products').update(row).eq('id', id) : await adminDb.from('products').insert(row)
   if (error) return { error: error.message }
   refresh()
   return {}
@@ -61,7 +63,7 @@ export async function saveProductAction(formData: FormData): Promise<{ error?: s
 export async function updateStockAction(id: string, stock: number): Promise<{ error?: string }> {
   const supabase = await requireAdmin()
   if (!(stock >= 0)) return { error: 'Stok tidak boleh negatif.' }
-  const { error } = await supabase.from('products').update({ stock_kg: stock }).eq('id', id)
+  const { error } = await adminDb.from('products').update({ stock_kg: stock }).eq('id', id)
   if (error) return { error: error.message }
   refresh()
   return {}
@@ -69,13 +71,13 @@ export async function updateStockAction(id: string, stock: number): Promise<{ er
 
 export async function toggleActiveAction(id: string, active: boolean) {
   const supabase = await requireAdmin()
-  await supabase.from('products').update({ is_active: active }).eq('id', id)
+  await adminDb.from('products').update({ is_active: active }).eq('id', id)
   refresh()
 }
 
 export async function verifyPaidAction(orderId: string) {
   const supabase = await requireAdmin()
-  await supabase.from('orders').update({ payment_status: 'paid' }).eq('id', orderId)
+  await adminDb.from('orders').update({ payment_status: 'paid' }).eq('id', orderId)
   refresh()
 }
 
@@ -83,12 +85,12 @@ const NEXT: Partial<Record<OrderStatus, OrderStatus>> = { pending: 'preparing', 
 
 export async function advanceOrderAction(orderId: string): Promise<{ error?: string }> {
   const supabase = await requireAdmin()
-  const { data: o } = await supabase.from('orders').select('order_status, payment_method').eq('id', orderId).single()
+  const { data: o } = await adminDb.from('orders').select('order_status, payment_method').eq('id', orderId).single()
   const next = o ? NEXT[o.order_status as OrderStatus] : undefined
   if (!o || !next) return { error: 'Status tidak dapat dilanjutkan.' }
   const patch: Record<string, string> = { order_status: next }
   if (next === 'completed' && o.payment_method === 'cod') patch.payment_status = 'paid'
-  const { error } = await supabase.from('orders').update(patch).eq('id', orderId).eq('order_status', o.order_status)
+  const { error } = await adminDb.from('orders').update(patch).eq('id', orderId).eq('order_status', o.order_status)
   if (error) return { error: error.message }
   refresh()
   return {}
