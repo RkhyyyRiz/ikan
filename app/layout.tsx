@@ -14,9 +14,3 @@ export const metadata: Metadata = {
   title: { default: 'Budi Daya Ikan Kalbar — Ikan Segar Langsung dari Kolam', template: '%s | Budi Daya Ikan Kalbar' },
   description: 'Beli ikan nila, lele, dan patin segar langsung dari pembudidaya di Kalimantan Barat. Pesan hidup, segar, atau bersih siap masak.',
 }
-export const viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-}
