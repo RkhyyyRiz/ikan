@@ -7,13 +7,26 @@ import type { Product, Profile } from '@/lib/types'
 export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const [{ data: products }, { data: profile }] = await Promise.all([
-    supabase.from('products').select('*').eq('is_active', true).order('created_at', { ascending: false }),
-    user ? supabase.from('profiles').select('id,full_name,email,phone,address,role').eq('id', user.id).maybeSingle() : Promise.resolve({ data: null }),
-  ])
-  const me = profile as Profile | null
+  let user: any = null
+  let products: any[] = []
+  let me: Profile | null = null
+
+  try {
+    const supabase = await createClient()
+    const authRes = await supabase.auth.getUser()
+    user = authRes?.data?.user ?? null
+
+    const [{ data: prodData }, { data: profileData }] = await Promise.all([
+      supabase.from('products').select('*').eq('is_active', true).order('created_at', { ascending: false }),
+      user
+        ? supabase.from('profiles').select('id,full_name,email,phone,address,role').eq('id', user.id).maybeSingle()
+        : Promise.resolve({ data: null }),
+    ])
+    products = prodData ?? []
+    me = (profileData as Profile | null) ?? null
+  } catch (err) {
+    console.error('Home page fetch error:', err)
+  }
 
   return (
     <>
