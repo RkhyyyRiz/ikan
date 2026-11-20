@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition } from "react"
+import { useRouter } from "next/navigation"
 import { adminCancelOrderAction, advanceOrderAction, verifyPaidAction } from '@/app/actions/admin'
 import { kg, ORDER_BADGE, ORDER_STATUS_LABEL, PAYMENT_BADGE, PAYMENT_STATUS_LABEL, PROCESSING_LABEL, rupiah, tanggalWaktu } from '@/lib/format'
 import type { Order, OrderStatus } from '@/lib/types'
@@ -10,6 +11,25 @@ const ADVANCE_LABEL: Partial<Record<OrderStatus, string>> = {
 }
 
 export default function AdminOrderCard({ order: o, proofUrl }: { order: Order & { profiles: { full_name: string; phone: string | null } | null }; proofUrl: string | null }) {
+  const onCancelOrder = async (orderId: string) => {
+    if (!window.confirm("Yakin ingin membatalkan pesanan ini?")) return;
+    try {
+      const { error } = await createClient()
+        .from("orders")
+        .update({ order_status: "cancelled" })
+        .eq("id", orderId);
+      if (error) {
+        alert("Gagal membatalkan pesanan: " + error.message);
+        return;
+      }
+      alert("Pesanan berhasil dibatalkan.");
+      if (typeof router !== "undefined") router.refresh();
+      else window.location.reload();
+    } catch (err: any) {
+      alert("Terjadi kesalahan: " + (err?.message || "unknown"));
+    }
+  };
+
   const [showProof, setShowProof] = useState(false)
   const [error, setError] = useState('')
   const [pending, start] = useTransition()
