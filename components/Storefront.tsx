@@ -175,7 +175,6 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
     router.prefetch("/admin");
     router.prefetch("/orders");
   }, [router]);
-  const router = useRouter()
   const [activeNav, setActiveNav] = useState<'home' | 'search' | 'cart' | 'orders' | 'profile'>('home')
   const [showSearch, setShowSearch] = useState(false)
   const [query, setQuery] = useState('')
