@@ -12,15 +12,6 @@ function StockEditor({ p }: { p: Product }) {
   const [msg, setMsg] = useState('')
   const [pending, start] = useTransition()
   const dirty = Number(val.replace(',', '.')) !== Number(p.stock_kg)
-  const handleDeleteProduct = async (id: string, name: string) => {
-    if (!window.confirm(`Hapus produk "${name}" secara permanen?`)) return;
-    const { error } = await createClient().from("products").delete().eq("id", id);
-    if (error) {
-      alert("Gagal menghapus (produk mungkin sudah ada di riwayat pesanan). Cukup klik Nonaktifkan saja.");
-      return;
-    }
-    window.location.reload();
-  };
 
   return (
     <div>
@@ -101,6 +92,16 @@ function ProductForm({ product, onClose }: { product: Product | null; onClose: (
 }
 
 export default function ProductManager({ products }: { products: Product[] }) {
+  const handleDeleteProduct = async (id: string, name: string) => {
+    if (!window.confirm(`Hapus produk "${name}" secara permanen?`)) return;
+    const { error } = await createClient().from("products").delete().eq("id", id);
+    if (error) {
+      alert("Gagal menghapus (produk mungkin sudah ada di riwayat pesanan). Cukup klik Nonaktifkan saja.");
+      return;
+    }
+    window.location.reload();
+  };
+
   const [editing, setEditing] = useState<Product | null | undefined>(undefined) // undefined = tertutup, null = baru
   const [, start] = useTransition()
 
