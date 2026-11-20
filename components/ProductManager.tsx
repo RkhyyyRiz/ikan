@@ -132,7 +132,7 @@ export default function ProductManager({ products }: { products: Product[] }) {
                 <button className="btn-outline" onClick={() => start(() => toggleActiveAction(p.id, !p.is_active))}>{p.is_active ? 'Nonaktifkan' : 'Aktifkan'}</button>
                 <button
                   type="button"
-                  onClick={() => handleDeleteProduct(item.id, item.name)}
+                  onClick={() => handleDeleteProduct(p.id, p.name)}
                   className="rounded-xl border border-red-200 bg-red-50 px-3.5 py-2 text-xs font-bold text-red-600 transition hover:bg-red-100 active:scale-95"
                 >
                   Hapus
