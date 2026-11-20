@@ -1,3 +1,4 @@
+import { createClient as createAdminClient } from "@supabase/supabase-js"
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import AdminNav from '@/components/AdminNav'
@@ -10,7 +11,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login?next=/admin')
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+  const adminDb = createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  const { data: profile } = await adminDb.from("profiles").select("role").eq("id", user.id).single()
   if (profile?.role !== 'admin') redirect('/dashboard')
 
   return (
