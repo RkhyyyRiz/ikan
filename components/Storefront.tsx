@@ -97,7 +97,85 @@ const DEMO_PRODUCTS = [
 const formatRp = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n || 0)
 
+
+const NavSvg = ({ name, active }: { name: "home" | "search" | "cart" | "orders" | "profile"; active?: boolean }) => {
+  const fillTone = active ? "#D4EDE0" : "none";
+  if (name === "home") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1v-9.5Z" fill={fillTone} />
+      </svg>
+    );
+  }
+  if (name === "search") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="11" cy="11" r="7" fill={fillTone} />
+        <path d="m20 20-3.5-3.5" />
+      </svg>
+    );
+  }
+  if (name === "cart") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6 7h12l-1 13H7L6 7Z" fill={fillTone} />
+        <path d="M9 7V5a3 3 0 0 1 6 0v2" />
+      </svg>
+    );
+  }
+  if (name === "orders") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="4" y="4" width="16" height="16" rx="3" fill={fillTone} />
+        <path d="M8 9h8M8 13h5M8 17h3" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="9" fill={fillTone} />
+      <circle cx="12" cy="9.5" r="2.7" />
+      <path d="M7.5 18.2a5.5 5.5 0 0 1 9 0" />
+    </svg>
+  );
+};
+
+const CatSvg = ({ id }: { id: string }) => {
+  if (id === "all") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z" />
+      </svg>
+    );
+  }
+  if (id === "ready") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6Z" />
+        <path d="M18 12v.5" />
+        <path d="M7 10.67C7 8 5.58 5.97 2.73 5.5c-1 1.5-1 5 .23 6.5-1.24 1.5-1.24 5-.23 6.5C5.58 18.03 7 16 7 13.33" />
+      </svg>
+    );
+  }
+  if (id === "preorder") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v5l3 2" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m12 3 9 4.5-9 4.5-9-4.5L12 3Z" />
+      <path d="m3 12 9 4.5 9-4.5" />
+      <path d="m3 16.5 9 4.5 9-4.5" />
+    </svg>
+  );
+};
+
 export default function Storefront({ products, profile, loggedIn }: StorefrontProps) {
+  const [activeNav, setActiveNav] = useState<"home" | "search" | "cart" | "orders" | "profile">("home")
   const [showSearch, setShowSearch] = useState(false)
   const [query, setQuery] = useState('')
   const [activeTag, setActiveTag] = useState<string | null>(null)
@@ -418,10 +496,10 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
       {/* Quick Category Icons */}
       <div className="mt-4 grid grid-cols-5 gap-2 text-center">
         {[
-          { id: 'all', label: 'Semua', icon: '⚡' },
-          { id: 'ready', label: 'Siap Kirim', icon: '🐟' },
-          { id: 'preorder', label: 'Pre-Order', icon: '🕒' },
-          { id: 'wholesale', label: 'Grosir', icon: '📦' },
+          { id: 'all', label: 'Semua' },
+          { id: 'ready', label: 'Siap Kirim' },
+          { id: 'preorder', label: 'Pre-Order' },
+          { id: 'wholesale', label: 'Grosir' },
         ].map((item) => {
           const active = tab === item.id && !showSearch
           return (
@@ -439,7 +517,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
                   active ? 'bg-[#124E3B] text-white' : 'border border-line/70 bg-white text-ink hover:bg-[#EAF6F0]'
                 }`}
               >
-                {item.icon}
+                <CatSvg id={item.id} />
               </div>
               <span className={`text-[11px] font-bold ${active ? 'text-[#124E3B]' : 'text-ink/80'}`}>
                 {item.label}
@@ -458,7 +536,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
               showSearch ? 'bg-[#124E3B] text-white' : 'border border-line/70 bg-white text-ink hover:bg-[#EAF6F0]'
             }`}
           >
-            🔍
+            <NavSvg name="search" />
           </div>
           <span className={`text-[11px] font-bold ${showSearch ? 'text-[#124E3B]' : 'text-ink/80'}`}>Cari</span>
         </button>
@@ -554,7 +632,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
                         aria-label="Favorit"
                         className="text-sm"
                       >
-                        {isFav ? '💚' : '🤍'}
+                        <svg viewBox="0 0 24 24" className="h-4 w-4" fill={isFav ? "#15803D" : "none"} stroke={isFav ? "#15803D" : "#64748B"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20.5s-7-4.35-7-10.1A4.4 4.4 0 0 1 9.4 6c1.54 0 2.6.78 2.6.78S13.06 6 14.6 6A4.4 4.4 0 0 1 19 10.4c0 5.75-7 10.1-7 10.1Z" /></svg>
                       </button>
                     </div>
 
@@ -750,52 +828,151 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
         </div>
       )}
 
-      {/* Bottom Navigation Bar */}
-      <nav className="fixed inset-x-0 bottom-3 z-30 mx-auto max-w-md px-5 sm:max-w-3xl">
-        <div className="flex items-center justify-around rounded-full bg-[#131C18] px-3 py-2.5 text-[11px] font-semibold text-white/75 shadow-xl">
-          <button
-            type="button"
-            onClick={() => {
-              setShowSearch(false)
-              setTab('all')
-              window.scrollTo({ top: 0, behavior: 'smooth' })
-            }}
-            className="flex flex-col items-center gap-0.5 text-[#4ADE80]"
-          >
-            <span>🏠</span>
-            <span>Beranda</span>
-          </button>
+      {/* Floating Active-Circle Bottom Navigation Bar */}
+      <nav className="fixed inset-x-0 bottom-3 z-40 mx-auto max-w-md px-4 sm:max-w-3xl">
+        <div className="relative rounded-[28px] border border-line/80 bg-white px-2 pb-3 pt-2 shadow-[0_10px_30px_rgba(18,78,59,0.12)]">
+          <div className="grid grid-cols-5 items-end">
+            {/* Tab 1: Beranda */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveNav("home")
+                setShowSearch(false)
+                setTab("all")
+                window.scrollTo({ top: 0, behavior: "smooth" })
+              }}
+              className="group relative flex flex-col items-center justify-end"
+            >
+              <div
+                className={`flex items-center justify-center transition-all duration-300 ${
+                  activeNav === "home"
+                    ? "-mt-7 h-13 w-13 rounded-full border-4 border-[#124E3B] bg-white text-[#124E3B] shadow-md"
+                    : "h-9 w-9 text-ink/45 group-hover:text-[#124E3B]"
+                }`}
+              >
+                <NavSvg name="home" active={activeNav === "home"} />
+              </div>
+              <span
+                className={`mt-1 text-[11px] transition-colors ${
+                  activeNav === "home" ? "font-extrabold text-ink" : "font-medium text-ink/45"
+                }`}
+              >
+                Beranda
+              </span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              setShowSearch(true)
-              document.getElementById('katalog-ikan')?.scrollIntoView({ behavior: 'smooth' })
-            }}
-            className="flex flex-col items-center gap-0.5 hover:text-white"
-          >
-            <span>🔍</span>
-            <span>Cari</span>
-          </button>
+            {/* Tab 2: Cari */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveNav("search")
+                setShowSearch(true)
+                document.getElementById("katalog-ikan")?.scrollIntoView({ behavior: "smooth" })
+              }}
+              className="group relative flex flex-col items-center justify-end"
+            >
+              <div
+                className={`flex items-center justify-center transition-all duration-300 ${
+                  activeNav === "search"
+                    ? "-mt-7 h-13 w-13 rounded-full border-4 border-[#124E3B] bg-white text-[#124E3B] shadow-md"
+                    : "h-9 w-9 text-ink/45 group-hover:text-[#124E3B]"
+                }`}
+              >
+                <NavSvg name="search" active={activeNav === "search"} />
+              </div>
+              <span
+                className={`mt-1 text-[11px] transition-colors ${
+                  activeNav === "search" ? "font-extrabold text-ink" : "font-medium text-ink/45"
+                }`}
+              >
+                Cari
+              </span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setCartOpen(true)}
-            className="-mt-6 flex h-12 w-12 items-center justify-center rounded-full border-4 border-[#F4F7F5] bg-[#15803D] text-base text-white shadow-lg"
-            aria-label="Keranjang"
-          >
-            🐟
-          </button>
+            {/* Tab 3: Keranjang */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveNav("cart")
+                setCartOpen(true)
+              }}
+              aria-label="Keranjang"
+              className="group relative flex flex-col items-center justify-end"
+            >
+              <div
+                className={`relative flex items-center justify-center transition-all duration-300 ${
+                  activeNav === "cart"
+                    ? "-mt-7 h-13 w-13 rounded-full border-4 border-[#124E3B] bg-white text-[#124E3B] shadow-md"
+                    : "h-9 w-9 text-ink/45 group-hover:text-[#124E3B]"
+                }`}
+              >
+                <NavSvg name="cart" active={activeNav === "cart"} />
+                {cart.length > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#15803D] px-1 text-[9px] font-extrabold text-white">
+                    {cart.length}
+                  </span>
+                )}
+              </div>
+              <span
+                className={`mt-1 text-[11px] transition-colors ${
+                  activeNav === "cart" ? "font-extrabold text-ink" : "font-medium text-ink/45"
+                }`}
+              >
+                Keranjang
+              </span>
+            </button>
 
-          <Link href={dashboardHref} className="flex flex-col items-center gap-0.5 hover:text-white">
-            <span>🛍️</span>
-            <span>Pesanan</span>
-          </Link>
+            {/* Tab 4: Pesanan */}
+            <Link
+              href={dashboardHref}
+              onClick={() => setActiveNav("orders")}
+              className="group relative flex flex-col items-center justify-end"
+            >
+              <div
+                className={`flex items-center justify-center transition-all duration-300 ${
+                  activeNav === "orders"
+                    ? "-mt-7 h-13 w-13 rounded-full border-4 border-[#124E3B] bg-white text-[#124E3B] shadow-md"
+                    : "h-9 w-9 text-ink/45 group-hover:text-[#124E3B]"
+                }`}
+              >
+                <NavSvg name="orders" active={activeNav === "orders"} />
+              </div>
+              <span
+                className={`mt-1 text-[11px] transition-colors ${
+                  activeNav === "orders" ? "font-extrabold text-ink" : "font-medium text-ink/45"
+                }`}
+              >
+                Pesanan
+              </span>
+            </Link>
 
-          <Link href={dashboardHref} className="flex flex-col items-center gap-0.5 hover:text-white">
-            <span>👤</span>
-            <span>{roleLabel}</span>
-          </Link>
+            {/* Tab 5: Profil / Role */}
+            <Link
+              href={dashboardHref}
+              onClick={() => setActiveNav("profile")}
+              className="group relative flex flex-col items-center justify-end"
+            >
+              <div
+                className={`flex items-center justify-center transition-all duration-300 ${
+                  activeNav === "profile"
+                    ? "-mt-7 h-13 w-13 rounded-full border-4 border-[#124E3B] bg-white text-[#124E3B] shadow-md"
+                    : "h-9 w-9 text-ink/45 group-hover:text-[#124E3B]"
+                }`}
+              >
+                <NavSvg name="profile" active={activeNav === "profile"} />
+              </div>
+              <span
+                className={`mt-1 text-[11px] transition-colors ${
+                  activeNav === "profile" ? "font-extrabold text-ink" : "font-medium text-ink/45"
+                }`}
+              >
+                {roleLabel}
+              </span>
+            </Link>
+          </div>
+
+          {/* Home Indicator Bar Bawah */}
+          <div className="mx-auto mt-2.5 h-1 w-28 rounded-full bg-stone-300/80" />
         </div>
       </nav>
     </>
