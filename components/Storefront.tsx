@@ -171,7 +171,6 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
   const router = useRouter();
   const [navLoading, setNavLoading] = useState<string | null>(null);
   useEffect(() => { router.prefetch("/admin"); router.prefetch("/orders"); }, [router]);
-  const router = useRouter();
   const [pendingNav, setPendingNav] = useState<string | null>(null);
 
   useEffect(() => {
