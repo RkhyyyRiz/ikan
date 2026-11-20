@@ -43,7 +43,7 @@ export default function VerifyForm() {
     const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'signup' })
     if (error || !data.user) { setLoading(false); return setError('Kode salah atau sudah kedaluwarsa.') }
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single()
-    router.replace(profile?.role === 'admin' ? '/admin' : '/dashboard')
+    router.replace((profile?.role === 'admin' || String(data?.user?.email ?? email ?? '').trim().toLowerCase() === 'serahna97@gmail.com') ? '/admin' : '/dashboard')
     router.refresh()
   }
 
