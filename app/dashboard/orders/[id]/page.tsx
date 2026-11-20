@@ -78,7 +78,19 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             <div className="mt-3">
               {o.payment_status === 'verifying' && <p className="mb-3 rounded-xl bg-kunyit-soft px-3 py-3 text-sm text-kunyit">Bukti pembayaran sedang diperiksa admin. Anda masih bisa mengirim ulang jika salah foto.</p>}
               <p className="text-sm">Transfer tepat <b>{rupiah(o.total_amount)}</b> lewat QRIS atau rekening berikut:</p>
-              {qris && (
+              {o.qris_string ? (
+                    <div className="my-3 rounded-xl border border-line bg-white p-4 text-center">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-river">QRIS Otomatis (Verifikasi Instan)</p>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(o.qris_string)}`}
+                        alt="QRIS Otomatis Pakasir"
+                        className="mx-auto my-3 h-56 w-56 rounded-xl border border-line object-contain"
+                      />
+                      <p className="text-sm font-bold">Total Bayar: {rupiah(o.qris_total ?? o.total_amount)}</p>
+                      <p className="mt-1 text-xs text-ink-soft">Scan menggunakan GoPay, DANA, OVO, ShopeePay, atau m-Banking. Status otomatis Lunas setelah dibayar.</p>
+                    </div>
+                  ) : qris && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={qris} alt="Kode QRIS pembayaran" className="mx-auto my-3 h-56 w-56 rounded-xl border border-line object-contain" />
               )}

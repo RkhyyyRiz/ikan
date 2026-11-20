@@ -1,3 +1,4 @@
+import { createPakasirQris } from '@/lib/pakasir'
 'use server'
 
 import { revalidatePath } from 'next/cache'
@@ -27,6 +28,33 @@ export async function createOrderAction(input: OrderInput): Promise<{ error: str
     p_payment_method: input.payment, p_delivery_address: address, p_delivery_notes: input.notes.trim() || null,
   })
   if (error || !id) return { error: cleanMsg(error?.message ?? 'Pesanan gagal dibuat. Coba lagi.') }
+
+  // Generate QRIS dinamis otomatis lewat Pakasir jika metode pembayaran non-COD
+  try {
+    const { data: createdOrder } = await supabase
+      .from('orders')
+      .select('invoice_code, total_amount, payment_method')
+      .eq('id', id)
+      .single()
+
+    if (createdOrder && createdOrder.payment_method !== 'cod') {
+      const qris = await createPakasirQris({
+        orderId: createdOrder.invoice_code,
+        amount: Number(createdOrder.total_amount),
+      })
+      await supabase
+        .from('orders')
+        .update({
+          qris_string: qris.qrisString,
+          gateway_ref: qris.gatewayRef,
+          qris_total: qris.totalPayment,
+          qris_expires_at: qris.expiresAt,
+        })
+        .eq('id', id)
+    }
+  } catch (qrisErr) {
+    console.error('Gagal generate QRIS Pakasir:', qrisErr)
+  }
 
   // Simpan nomor & alamat ke profil hanya jika masih kosong
   const { data: profile } = await supabase.from('profiles').select('phone,address').eq('id', user.id).single()

@@ -20,6 +20,10 @@ export interface OrderItem {
 }
 
 export interface Order {
+  qris_string?: string | null
+  gateway_ref?: string | null
+  qris_total?: number | null
+  qris_expires_at?: string | null
   id: string; invoice_code: string; user_id: string; total_amount: number
   payment_method: PaymentMethod; payment_status: PaymentStatus; payment_proof_url: string | null
   order_status: OrderStatus; delivery_address: string; delivery_notes: string | null; created_at: string
