@@ -4,7 +4,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        paper: '#f5f6f2', card: '#ffffff', ink: '#14211f', mute: '#5d6b67', line: '#dfe3dc',
+        paper: '#F4F9F6', card: '#FFFFFF', ink: '#0F2419', mute: '#526B5D', line: '#DCEBE2',
         river: { DEFAULT: '#0b5d54', dark: '#08433d', soft: '#e3efec' },
         kunyit: { DEFAULT: '#9a5b06', soft: '#fbefd9' },
         merah: { DEFAULT: '#b3261e', soft: '#fbe7e5' },
