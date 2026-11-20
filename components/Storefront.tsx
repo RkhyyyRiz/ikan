@@ -1,7 +1,9 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
 type FilterTab = 'all' | 'ready' | 'preorder' | 'wholesale'
 
@@ -15,7 +17,11 @@ interface CartItem {
   key: string
   productId: string
   name: string
-  price: number
+  basePrice: number
+  wholesaleMinKg: number
+  wholesalePrice: number | null
+  cleaningFeePerKg: number
+  stockKg: number
   qty: number
   prep: string
 }
@@ -32,7 +38,7 @@ const HERO_SLIDES = [
     badge: 'Pasokan Warung & Resto',
     titleTop: 'Harga Grosir.',
     titleBottom: 'Stok Terjaga.',
-    desc: 'Pemesanan rutin 10 kg+ dengan pengiriman oksigen & coolbox.',
+    desc: 'Otomatis dapat harga grosir saat pembelian mencapai minimal kg.',
     cta: 'Lihat Paket Grosir',
   },
   {
@@ -45,91 +51,80 @@ const HERO_SLIDES = [
 ]
 
 const TAGS = ['#Nila', '#Patin', '#Lele', '#Gurame', '#Hidup', '#Bersih']
-const PREP_OPTIONS = ['Utuh Hidup', 'Segar (Es)', 'Bersih Sisik & Insang', 'Belah Bakar', 'Fillet']
+const PREP_OPTIONS = [
+  { label: 'Utuh Hidup', value: 'utuh_hidup', needsCleaning: false },
+  { label: 'Segar (Es)', value: 'segar_es', needsCleaning: false },
+  { label: 'Bersih Sisik & Insang', value: 'bersih', needsCleaning: true },
+  { label: 'Belah Bakar', value: 'belah_bakar', needsCleaning: true },
+  { label: 'Fillet', value: 'fillet', needsCleaning: true },
+]
 
 const DEMO_PRODUCTS = [
   {
     id: 'demo-nila',
     name: 'Ikan Nila Merah Kolam Deras',
     category: 'Nila',
-    condition: 'Hidup',
+    availability_type: 'ready',
     size_info: '3–4 ekor / kg',
     price_per_kg: 34000,
+    wholesale_min_kg: 5,
+    wholesale_price_per_kg: 30000,
+    cleaning_fee_per_kg: 2000,
     stock_kg: 28,
-    fulfillment_type: 'ready',
+    image_url: null,
     description: 'Nila merah daging tebal tanpa bau lumpur, dipanen langsung saat pesanan masuk.',
   },
   {
     id: 'demo-lele',
     name: 'Ikan Lele Sangkuriang Segar',
     category: 'Lele',
-    condition: 'Bersih',
+    availability_type: 'ready',
     size_info: '6–8 ekor / kg',
     price_per_kg: 26000,
+    wholesale_min_kg: 5,
+    wholesale_price_per_kg: 23000,
+    cleaning_fee_per_kg: 2000,
     stock_kg: 35,
-    fulfillment_type: 'ready',
+    image_url: null,
     description: 'Lele pakan pelet organik, tersedia hidup maupun bersih siap goreng.',
-  },
-  {
-    id: 'demo-patin',
-    name: 'Ikan Patin Sungai Kapuas',
-    category: 'Patin',
-    condition: 'Segar',
-    size_info: '1–2 ekor / kg',
-    price_per_kg: 29000,
-    stock_kg: 19,
-    fulfillment_type: 'wholesale',
-    description: 'Patin segar berdaging lembut, cocok untuk pindang, asam pedas, dan kebutuhan warung.',
-  },
-  {
-    id: 'demo-gurame',
-    name: 'Ikan Gurame Hitam Panen Pagi',
-    category: 'Gurame',
-    condition: 'Hidup',
-    size_info: '500–700 gr / ekor',
-    price_per_kg: 52000,
-    stock_kg: 12,
-    fulfillment_type: 'preorder',
-    description: 'Gurame kolam air jernih dengan cita rasa gurih manis, bisa belah bakar.',
   },
 ]
 
 const formatRp = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n || 0)
 
-
-const NavSvg = ({ name, active }: { name: "home" | "search" | "cart" | "orders" | "profile"; active?: boolean }) => {
-  const fillTone = active ? "#D4EDE0" : "none";
-  if (name === "home") {
+const NavSvg = ({ name, active }: { name: 'home' | 'search' | 'cart' | 'orders' | 'profile'; active?: boolean }) => {
+  const fillTone = active ? 'rgba(21, 128, 61, 0.22)' : 'none'
+  if (name === 'home') {
     return (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1v-9.5Z" fill={fillTone} />
       </svg>
-    );
+    )
   }
-  if (name === "search") {
+  if (name === 'search') {
     return (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="11" cy="11" r="7" fill={fillTone} />
         <path d="m20 20-3.5-3.5" />
       </svg>
-    );
+    )
   }
-  if (name === "cart") {
+  if (name === 'cart') {
     return (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
         <path d="M6 7h12l-1 13H7L6 7Z" fill={fillTone} />
         <path d="M9 7V5a3 3 0 0 1 6 0v2" />
       </svg>
-    );
+    )
   }
-  if (name === "orders") {
+  if (name === 'orders') {
     return (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
         <rect x="4" y="4" width="16" height="16" rx="3" fill={fillTone} />
         <path d="M8 9h8M8 13h5M8 17h3" />
       </svg>
-    );
+    )
   }
   return (
     <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
@@ -137,33 +132,33 @@ const NavSvg = ({ name, active }: { name: "home" | "search" | "cart" | "orders" 
       <circle cx="12" cy="9.5" r="2.7" />
       <path d="M7.5 18.2a5.5 5.5 0 0 1 9 0" />
     </svg>
-  );
-};
+  )
+}
 
 const CatSvg = ({ id }: { id: string }) => {
-  if (id === "all") {
+  if (id === 'all') {
     return (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
         <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z" />
       </svg>
-    );
+    )
   }
-  if (id === "ready") {
+  if (id === 'ready') {
     return (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
         <path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6Z" />
         <path d="M18 12v.5" />
         <path d="M7 10.67C7 8 5.58 5.97 2.73 5.5c-1 1.5-1 5 .23 6.5-1.24 1.5-1.24 5-.23 6.5C5.58 18.03 7 16 7 13.33" />
       </svg>
-    );
+    )
   }
-  if (id === "preorder") {
+  if (id === 'preorder') {
     return (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="9" />
         <path d="M12 7v5l3 2" />
       </svg>
-    );
+    )
   }
   return (
     <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
@@ -171,11 +166,12 @@ const CatSvg = ({ id }: { id: string }) => {
       <path d="m3 12 9 4.5 9-4.5" />
       <path d="m3 16.5 9 4.5 9-4.5" />
     </svg>
-  );
-};
+  )
+}
 
 export default function Storefront({ products, profile, loggedIn }: StorefrontProps) {
-  const [activeNav, setActiveNav] = useState<"home" | "search" | "cart" | "orders" | "profile">("home")
+  const router = useRouter()
+  const [activeNav, setActiveNav] = useState<'home' | 'search' | 'cart' | 'orders' | 'profile'>('home')
   const [showSearch, setShowSearch] = useState(false)
   const [query, setQuery] = useState('')
   const [activeTag, setActiveTag] = useState<string | null>(null)
@@ -190,7 +186,11 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
   const [cart, setCart] = useState<CartItem[]>([])
   const [harvestSlot, setHarvestSlot] = useState('Panen Pagi (06.00–09.00)')
   const [deliveryMethod, setDeliveryMethod] = useState('Kurir Lokal (Oksigen / Coolbox)')
+  const [deliveryAddress, setDeliveryAddress] = useState(profile?.address || '')
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'transfer'>('cod')
   const [buyerNote, setBuyerNote] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [orderFeedback, setOrderFeedback] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
 
   useEffect(() => {
     const onOpenMenu = () => setMenuOpen(true)
@@ -213,16 +213,15 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
       const name = (item.name || '').toLowerCase()
       const desc = (item.description || '').toLowerCase()
       const cat = (item.category || '').toLowerCase()
-      const cond = (item.condition || '').toLowerCase()
-      const fType = (item.fulfillment_type || 'ready').toLowerCase()
+      const avail = (item.availability_type || 'ready').toLowerCase()
 
-      if (tab === 'ready' && fType !== 'ready') return false
-      if (tab === 'preorder' && fType !== 'preorder') return false
-      if (tab === 'wholesale' && fType !== 'wholesale' && Number(item.stock_kg ?? 10) < 10) return false
+      if (tab === 'ready' && avail !== 'ready') return false
+      if (tab === 'preorder' && avail !== 'preorder') return false
+      if (tab === 'wholesale' && !item.wholesale_price_per_kg && Number(item.stock_kg ?? 0) < 5) return false
 
       if (activeTag) {
         const cleanTag = activeTag.replace('#', '').toLowerCase()
-        if (!name.includes(cleanTag) && !cat.includes(cleanTag) && !cond.includes(cleanTag) && !desc.includes(cleanTag)) {
+        if (!name.includes(cleanTag) && !cat.includes(cleanTag) && !desc.includes(cleanTag)) {
           return false
         }
       }
@@ -245,10 +244,18 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
     document.getElementById('katalog-ikan')?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  const calcCartLine = (c: CartItem) => {
+    const isWholesale = c.wholesalePrice !== null && c.wholesaleMinKg > 0 && c.qty >= c.wholesaleMinKg
+    const unitPrice = isWholesale && c.wholesalePrice !== null ? c.wholesalePrice : c.basePrice
+    const prepObj = PREP_OPTIONS.find((p) => p.label === c.prep)
+    const cleaningFee = prepObj?.needsCleaning ? c.cleaningFeePerKg : 0
+    const subtotal = Math.round((unitPrice + cleaningFee) * c.qty)
+    return { unitPrice, cleaningFee, subtotal, isWholesale }
+  }
+
   const addToCart = (item: any) => {
-    const prep = selectedPrep[item.id] || PREP_OPTIONS[0]
+    const prep = selectedPrep[item.id] || PREP_OPTIONS[0].label
     const key = `${item.id}::${prep}`
-    const price = Number(item.price_per_kg ?? item.price ?? 0)
     setCart((prev) => {
       const idx = prev.findIndex((c) => c.key === key)
       if (idx >= 0) {
@@ -256,7 +263,21 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
         copy[idx] = { ...copy[idx], qty: Number((copy[idx].qty + 0.5).toFixed(1)) }
         return copy
       }
-      return [...prev, { key, productId: item.id, name: item.name, price, qty: 1, prep }]
+      return [
+        ...prev,
+        {
+          key,
+          productId: item.id,
+          name: item.name,
+          basePrice: Number(item.price_per_kg ?? 0),
+          wholesaleMinKg: Number(item.wholesale_min_kg ?? 0),
+          wholesalePrice: item.wholesale_price_per_kg ? Number(item.wholesale_price_per_kg) : null,
+          cleaningFeePerKg: Number(item.cleaning_fee_per_kg ?? 0),
+          stockKg: Number(item.stock_kg ?? 100),
+          qty: 1,
+          prep,
+        },
+      ]
     })
   }
 
@@ -269,28 +290,101 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
   }
 
   const totalKg = cart.reduce((acc, c) => acc + c.qty, 0)
-  const totalPrice = cart.reduce((acc, c) => acc + c.qty * c.price, 0)
+  const totalPrice = cart.reduce((acc, c) => acc + calcCartLine(c).subtotal, 0)
 
-  const handleCheckoutWhatsApp = () => {
-    const lines = cart.map(
-      (c, i) => `${i + 1}. ${c.name} (${c.qty} kg) — Opsi: ${c.prep} = ${formatRp(c.qty * c.price)}`
-    )
-    const msg = [
-      'Halo *Budi Daya Ikan Kalbar*, saya ingin memesan ikan segar:',
-      '',
-      ...lines,
-      '',
-      `*Total Berat:* ${totalKg} kg`,
-      `*Estimasi Total:* ${formatRp(totalPrice)}`,
-      `*Jadwal Panen:* ${harvestSlot}`,
-      `*Metode:* ${deliveryMethod}`,
-      buyerNote ? `*Catatan:* ${buyerNote}` : '',
-      loggedIn && profile?.full_name ? `*Pemesan:* ${profile.full_name}` : '',
-    ]
-      .filter(Boolean)
-      .join('\n')
+  const handleCheckoutWeb = async () => {
+    setOrderFeedback(null)
 
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer')
+    if (!loggedIn) {
+      setOrderFeedback({ type: 'err', text: 'Silakan masuk akun terlebih dahulu untuk membuat pesanan.' })
+      setTimeout(() => router.push('/login'), 1100)
+      return
+    }
+
+    if (isDemoMode) {
+      setOrderFeedback({ type: 'err', text: 'Produk contoh tidak dapat dipesan. Tambahkan produk di Panel Admin.' })
+      return
+    }
+
+    const finalAddress =
+      deliveryMethod.includes('Ambil Sendiri')
+        ? 'Ambil Sendiri di Kolam Budidaya Kalbar'
+        : deliveryAddress.trim()
+
+    if (!finalAddress) {
+      setOrderFeedback({ type: 'err', text: 'Isi alamat pengantaran terlebih dahulu.' })
+      return
+    }
+
+    setSubmitting(true)
+    try {
+      const supabase = createClient()
+      const { data: authData } = await supabase.auth.getUser()
+      const userId = authData?.user?.id
+      if (!userId) {
+        router.push('/login')
+        return
+      }
+
+      const invoiceCode = `INV-${Date.now().toString().slice(-6)}`
+      const notesCombined = [
+        `Jadwal: ${harvestSlot}`,
+        `Metode: ${deliveryMethod}`,
+        buyerNote.trim() ? `Catatan: ${buyerNote.trim()}` : '',
+      ]
+        .filter(Boolean)
+        .join(' | ')
+
+      const { data: insertedOrder, error: orderErr } = await supabase
+        .from('orders')
+        .insert({
+          invoice_code: invoiceCode,
+          user_id: userId,
+          total_amount: totalPrice,
+          payment_method: paymentMethod,
+          payment_status: 'unpaid',
+          order_status: 'pending',
+          delivery_address: finalAddress,
+          delivery_notes: notesCombined,
+        })
+        .select('id')
+        .single()
+
+      if (orderErr || !insertedOrder) {
+        throw new Error(orderErr?.message || 'Gagal membuat pesanan')
+      }
+
+      const itemsPayload = cart.map((c) => {
+        const calc = calcCartLine(c)
+        const prepValue = PREP_OPTIONS.find((p) => p.label === c.prep)?.value || 'utuh_hidup'
+        return {
+          order_id: insertedOrder.id,
+          product_id: c.productId,
+          weight_kg: c.qty,
+          processing_option: prepValue,
+          unit_price_applied: calc.unitPrice,
+          cleaning_fee_applied: calc.cleaningFee,
+          subtotal: calc.subtotal,
+        }
+      })
+
+      const { error: itemsErr } = await supabase.from('order_items').insert(itemsPayload)
+      if (itemsErr) {
+        throw new Error(itemsErr.message)
+      }
+
+      setCart([])
+      setOrderFeedback({ type: 'ok', text: `Pesanan ${invoiceCode} berhasil dibuat! Mengalihkan ke riwayat pesanan...` })
+      setTimeout(() => {
+        setCartOpen(false)
+        router.push(isAdmin ? '/admin' : '/dashboard')
+        router.refresh()
+      }, 1000)
+    } catch (err: any) {
+      setOrderFeedback({ type: 'err', text: err?.message || 'Terjadi kesalahan saat menyimpan pesanan.' })
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -300,21 +394,21 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
         <div className="fixed inset-0 z-50 flex">
           <div
             onClick={() => setMenuOpen(false)}
-            className="fixed inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity"
+            className="fixed inset-0 bg-black/45 backdrop-blur-[2px] transition-opacity duration-300"
           />
-          <aside className="animate-vibe-fade-up relative z-10 flex h-full w-72 max-w-[82vw] flex-col justify-between bg-[#124E3B] p-5 text-white shadow-2xl">
+          <aside className="animate-smooth-card relative z-10 flex h-full w-72 max-w-[82vw] flex-col justify-between bg-[#124E3B] p-5 text-white shadow-2xl">
             <div>
               <div className="flex items-center justify-between border-b border-white/15 pb-4">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-wider text-[#EAF6F0]/75">
                     Budi Daya Ikan Kalbar
                   </p>
-                  <p className="mt-0.5 text-sm font-extrabold">{accountName}</p>
+                  <p className="mt-0.5 text-sm font-extrabold text-white">{accountName}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setMenuOpen(false)}
-                  className="rounded-lg bg-white/10 px-2.5 py-1 text-xs font-bold hover:bg-white/20"
+                  className="rounded-lg bg-white/10 px-2.5 py-1 text-xs font-bold text-white transition hover:bg-white/20"
                 >
                   Tutup
                 </button>
@@ -333,7 +427,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
                     setActiveTag(null)
                     setMenuOpen(false)
                   }}
-                  className="rounded-xl px-3 py-2.5 text-left transition hover:bg-white/10"
+                  className="rounded-xl px-3 py-2.5 text-left text-white transition hover:bg-white/10"
                 >
                   Katalog Panen Hari Ini
                 </button>
@@ -343,7 +437,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
                     setTab('wholesale')
                     setMenuOpen(false)
                   }}
-                  className="rounded-xl px-3 py-2.5 text-left transition hover:bg-white/10"
+                  className="rounded-xl px-3 py-2.5 text-left text-white transition hover:bg-white/10"
                 >
                   Paket Grosir Warung & Resto
                 </button>
@@ -353,22 +447,22 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
                     setTab('preorder')
                     setMenuOpen(false)
                   }}
-                  className="rounded-xl px-3 py-2.5 text-left transition hover:bg-white/10"
+                  className="rounded-xl px-3 py-2.5 text-left text-white transition hover:bg-white/10"
                 >
                   Jadwal Booking Panen
                 </button>
                 <Link
                   href={dashboardHref}
                   onClick={() => setMenuOpen(false)}
-                  className="rounded-xl px-3 py-2.5 transition hover:bg-white/10"
+                  className="rounded-xl px-3 py-2.5 text-white transition hover:bg-white/10"
                 >
                   {loggedIn ? (isAdmin ? 'Dashboard Admin' : 'Dashboard & Pesanan Saya') : 'Masuk / Daftar Akun'}
                 </Link>
               </nav>
             </div>
 
-            <div className="rounded-xl bg-[#15803D]/50 p-3 text-[11px] leading-relaxed text-[#EAF6F0]">
-              Panen Pagi 06.00–09.00 & Panen Sore 15.00–18.00. Gratis bersihkan sisik & insang.
+            <div className="rounded-xl bg-[#15803D]/55 p-3 text-[11px] leading-relaxed text-[#EAF6F0]">
+              Tema otomatis menyesuaikan mode terang/gelap HP Anda. Panen Pagi 06.00–09.00 & Panen Sore 15.00–18.00.
             </div>
           </aside>
         </div>
@@ -380,7 +474,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
           type="button"
           onClick={() => setMenuOpen(true)}
           aria-label="Buka Menu"
-          className="flex h-10 items-center gap-2 rounded-xl border border-line/80 bg-white px-3.5 text-xs font-bold text-ink shadow-xs transition duration-200 hover:scale-105 hover:bg-[#EAF6F0] active:scale-95"
+          className="flex h-10 items-center gap-2 rounded-xl border border-line/80 bg-white px-3.5 text-xs font-bold text-ink shadow-xs transition-transform duration-200 hover:scale-[1.03] active:scale-95"
         >
           <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
             <path d="M4 7h16M4 12h11M4 17h16" />
@@ -390,7 +484,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
 
         <Link
           href={dashboardHref}
-          className="flex items-center gap-1.5 rounded-full bg-[#EAF6F0] px-3.5 py-1.5 text-[11px] font-extrabold text-[#124E3B] transition hover:bg-[#124E3B] hover:text-white"
+          className="flex items-center gap-1.5 rounded-full bg-[#EAF6F0] px-3.5 py-1.5 text-[11px] font-extrabold text-[#124E3B] transition-all duration-200 hover:scale-[1.03] active:scale-95"
         >
           <span className="h-2 w-2 rounded-full bg-[#15803D]" />
           <span>Mode {roleLabel}</span>
@@ -409,14 +503,14 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
           if (diff > 40) setSlideIdx((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)
           touchStartX.current = null
         }}
-        className="relative overflow-hidden rounded-[26px] bg-gradient-to-br from-[#124E3B] via-[#16624A] to-[#15803D] p-5 text-white shadow-lg"
+        className="relative overflow-hidden rounded-[26px] bg-gradient-to-br from-[#124E3B] via-[#16624A] to-[#15803D] p-5 text-white shadow-lg transition-all duration-500"
       >
-        <div className="flex items-center justify-between gap-4">
+        <div key={slideIdx} className="animate-smooth-card flex items-center justify-between gap-4">
           <div className="max-w-[68%]">
             <span className="inline-block rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold text-[#EAF6F0]">
               {currentSlide.badge}
             </span>
-            <h1 className="mt-3 text-2xl font-extrabold leading-tight tracking-tight">
+            <h1 className="mt-3 text-2xl font-extrabold leading-tight tracking-tight !text-white">
               {currentSlide.titleTop}
               <br />
               {currentSlide.titleBottom}
@@ -425,13 +519,13 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
             <button
               type="button"
               onClick={handleSlideCta}
-              className="mt-4 rounded-full bg-white px-4 py-2 text-xs font-extrabold text-[#124E3B] shadow-sm transition hover:scale-105 active:scale-95"
+              className="mt-4 rounded-full bg-white px-4 py-2 text-xs font-extrabold !text-[#124E3B] shadow-sm transition-transform duration-200 hover:scale-105 active:scale-95"
             >
               {currentSlide.cta}
             </button>
           </div>
 
-          <div className="animate-vibe-float flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl bg-white/10 backdrop-blur-xs">
+          <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl bg-white/10 backdrop-blur-xs transition-transform duration-500 hover:rotate-3">
             <svg viewBox="0 0 24 24" className="h-12 w-12 text-[#EAF6F0]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6Z" />
               <path d="M18 12v.5" />
@@ -481,9 +575,9 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
               key={tag}
               type="button"
               onClick={() => setActiveTag(isSelected ? null : tag)}
-              className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-bold transition ${
+              className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-bold transition-all duration-200 active:scale-95 ${
                 isSelected
-                  ? 'border-[#124E3B] bg-[#124E3B] text-white'
+                  ? 'border-[#124E3B] bg-[#124E3B] !text-white shadow-xs'
                   : 'border-line/80 bg-white text-ink hover:bg-[#EAF6F0]'
               }`}
             >
@@ -510,16 +604,18 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
                 setShowSearch(false)
                 setTab(item.id as FilterTab)
               }}
-              className="flex flex-col items-center gap-1.5"
+              className="flex flex-col items-center gap-1.5 transition-transform duration-200 active:scale-95"
             >
               <div
-                className={`flex h-12 w-12 items-center justify-center rounded-2xl text-base shadow-2xs transition ${
-                  active ? 'bg-[#124E3B] text-white' : 'border border-line/70 bg-white text-ink hover:bg-[#EAF6F0]'
+                className={`flex h-12 w-12 items-center justify-center rounded-2xl shadow-2xs transition-all duration-300 ${
+                  active
+                    ? 'scale-105 bg-[#124E3B] !text-white shadow-md'
+                    : 'border border-line/70 bg-white text-ink hover:bg-[#EAF6F0]'
                 }`}
               >
                 <CatSvg id={item.id} />
               </div>
-              <span className={`text-[11px] font-bold ${active ? 'text-[#124E3B]' : 'text-ink/80'}`}>
+              <span className={`text-[11px] font-bold transition-colors ${active ? 'text-[#124E3B]' : 'text-ink/80'}`}>
                 {item.label}
               </span>
             </button>
@@ -529,22 +625,26 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
         <button
           type="button"
           onClick={() => setShowSearch((v) => !v)}
-          className="flex flex-col items-center gap-1.5"
+          className="flex flex-col items-center gap-1.5 transition-transform duration-200 active:scale-95"
         >
           <div
-            className={`flex h-12 w-12 items-center justify-center rounded-2xl text-base shadow-2xs transition ${
-              showSearch ? 'bg-[#124E3B] text-white' : 'border border-line/70 bg-white text-ink hover:bg-[#EAF6F0]'
+            className={`flex h-12 w-12 items-center justify-center rounded-2xl shadow-2xs transition-all duration-300 ${
+              showSearch
+                ? 'scale-105 bg-[#124E3B] !text-white shadow-md'
+                : 'border border-line/70 bg-white text-ink hover:bg-[#EAF6F0]'
             }`}
           >
             <NavSvg name="search" />
           </div>
-          <span className={`text-[11px] font-bold ${showSearch ? 'text-[#124E3B]' : 'text-ink/80'}`}>Cari</span>
+          <span className={`text-[11px] font-bold transition-colors ${showSearch ? 'text-[#124E3B]' : 'text-ink/80'}`}>
+            Cari
+          </span>
         </button>
       </div>
 
       {/* Search Input */}
       {showSearch && (
-        <div className="mt-3 flex items-center gap-2 rounded-2xl border border-[#124E3B]/30 bg-white px-3.5 py-2 shadow-xs">
+        <div className="animate-smooth-card mt-3 flex items-center gap-2 rounded-2xl border border-[#124E3B]/30 bg-white px-3.5 py-2.5 shadow-xs">
           <input
             type="text"
             value={query}
@@ -564,13 +664,13 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
         </div>
       )}
 
-      {/* Katalog Produk */}
+      {/* Katalog Produk Dengan Foto Ikan Proporsional */}
       <section id="katalog-ikan" className="mt-6">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-base font-extrabold text-ink">Pilihan Segar</h2>
             {isDemoMode && (
-              <p className="text-[11px] text-ink/60">Menampilkan katalog contoh kolam (siap pesan via WA)</p>
+              <p className="text-[11px] text-ink/60">Katalog contoh kolam (tambahkan produk di Panel Admin)</p>
             )}
           </div>
           <button
@@ -587,7 +687,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
         </div>
 
         {filteredProducts.length === 0 ? (
-          <div className="mt-4 rounded-3xl border border-dashed border-line bg-white p-6 text-center">
+          <div className="animate-smooth-card mt-4 rounded-3xl border border-dashed border-line bg-white p-6 text-center">
             <p className="text-sm font-extrabold text-ink">Ikan belum ditemukan untuk filter ini</p>
             <p className="mt-1 text-xs text-ink/65">Coba reset filter kategori atau kata kunci pencarian.</p>
             <button
@@ -597,70 +697,129 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
                 setActiveTag(null)
                 setQuery('')
               }}
-              className="mt-3 rounded-full bg-[#124E3B] px-4 py-2 text-xs font-bold text-white"
+              className="mt-3 rounded-full bg-[#124E3B] px-4 py-2 text-xs font-bold !text-white transition hover:scale-105"
             >
               Tampilkan Semua Ikan
             </button>
           </div>
         ) : (
-          <div className="mt-3.5 grid grid-cols-1 gap-3.5 sm:grid-cols-2">
-            {filteredProducts.map((item) => {
-              const price = Number(item.price_per_kg ?? item.price ?? 0)
-              const stock = Number(item.stock_kg ?? 20)
-              const currentPrep = selectedPrep[item.id] || PREP_OPTIONS[0]
+          <div className="mt-3.5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {filteredProducts.map((item, idx) => {
+              const price = Number(item.price_per_kg ?? 0)
+              const wholesalePrice = item.wholesale_price_per_kg ? Number(item.wholesale_price_per_kg) : null
+              const wholesaleMin = Number(item.wholesale_min_kg ?? 0)
+              const cleaningFee = Number(item.cleaning_fee_per_kg ?? 0)
+              const stock = Number(item.stock_kg ?? 0)
+              const currentPrep = selectedPrep[item.id] || PREP_OPTIONS[0].label
               const isFav = !!liked[item.id]
+              const isPreorder = item.availability_type === 'preorder'
 
               return (
                 <article
                   key={item.id}
-                  className="flex flex-col justify-between rounded-3xl border border-line/75 bg-white p-4 shadow-2xs transition hover:border-[#15803D]/50 hover:shadow-md"
+                  style={{ animationDelay: `${idx * 55}ms` }}
+                  className="animate-smooth-card group flex flex-col justify-between overflow-hidden rounded-3xl border border-line/75 bg-white shadow-2xs transition-all duration-300 hover:-translate-y-0.5 hover:border-[#15803D]/50 hover:shadow-md"
                 >
                   <div>
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <span className="rounded-full bg-[#EAF6F0] px-2.5 py-0.5 text-[10px] font-extrabold text-[#124E3B]">
-                          {item.condition || 'Segar Kolam'}
-                        </span>
-                        <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-[10px] font-semibold text-ink/75">
-                          {item.size_info || '3–5 ekor/kg'}
-                        </span>
-                      </div>
+                    {/* Foto Ikan Proporsional di Bagian Atas Kartu */}
+                    <div className="relative aspect-[16/10] w-full overflow-hidden bg-gradient-to-br from-[#EAF6F0] to-[#D4EDE0]">
+                      {item.image_url ? (
+                        <img
+                          src={item.image_url}
+                          alt={item.name}
+                          loading="lazy"
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full flex-col items-center justify-center text-[#124E3B]/70">
+                          <svg viewBox="0 0 24 24" className="h-12 w-12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6Z" />
+                            <path d="M18 12v.5" />
+                            <path d="M16 17.93a9.77 9.77 0 0 1 0-11.86" />
+                            <path d="M7 10.67C7 8 5.58 5.97 2.73 5.5c-1 1.5-1 5 .23 6.5-1.24 1.5-1.24 5-.23 6.5C5.58 18.03 7 16 7 13.33" />
+                          </svg>
+                          <span className="mt-1 text-[10px] font-bold">Foto Ikan Segar Kalbar</span>
+                        </div>
+                      )}
 
-                      <button
-                        type="button"
-                        onClick={() => setLiked((p) => ({ ...p, [item.id]: !p[item.id] }))}
-                        aria-label="Favorit"
-                        className="text-sm"
-                      >
-                        <svg viewBox="0 0 24 24" className="h-4 w-4" fill={isFav ? "#15803D" : "none"} stroke={isFav ? "#15803D" : "#64748B"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20.5s-7-4.35-7-10.1A4.4 4.4 0 0 1 9.4 6c1.54 0 2.6.78 2.6.78S13.06 6 14.6 6A4.4 4.4 0 0 1 19 10.4c0 5.75-7 10.1-7 10.1Z" /></svg>
-                      </button>
+                      {/* Badge Status & Tombol Favorit Melayang di Atas Foto */}
+                      <div className="absolute inset-x-3 top-3 flex items-center justify-between gap-2">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className="rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-extrabold !text-[#124E3B] shadow-xs backdrop-blur-xs">
+                            {isPreorder ? 'Pre-Order Panen' : 'Siap Kirim'}
+                          </span>
+                          {wholesalePrice && wholesaleMin > 0 && (
+                            <span className="rounded-full bg-[#124E3B]/90 px-2.5 py-1 text-[10px] font-bold !text-white shadow-xs">
+                              Grosir ≥{wholesaleMin}kg: {formatRp(wholesalePrice)}
+                            </span>
+                          )}
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setLiked((p) => ({ ...p, [item.id]: !p[item.id] }))}
+                          aria-label="Favorit"
+                          className="flex h-8 w-8 items-center justify-center rounded-full bg-white/95 shadow-xs transition-transform duration-200 hover:scale-110 active:scale-90"
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            className="h-4 w-4"
+                            fill={isFav ? '#15803D' : 'none'}
+                            stroke={isFav ? '#15803D' : '#475569'}
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M12 20.5s-7-4.35-7-10.1A4.4 4.4 0 0 1 9.4 6c1.54 0 2.6.78 2.6.78S13.06 6 14.6 6A4.4 4.4 0 0 1 19 10.4c0 5.75-7 10.1-7 10.1Z" />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
 
-                    <h3 className="mt-2.5 text-sm font-extrabold text-ink">{item.name}</h3>
-                    <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-ink/70">
-                      {item.description || 'Ikan segar budidaya lokal Kalimantan Barat, dipanen langsung saat dipesan.'}
-                    </p>
+                    {/* Konten Detail Produk */}
+                    <div className="p-4 pb-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <h3 className="text-sm font-extrabold text-ink">{item.name}</h3>
+                        {item.size_info && (
+                          <span className="shrink-0 rounded-full bg-[#EAF6F0] px-2.5 py-0.5 text-[10px] font-bold text-[#124E3B]">
+                            {item.size_info}
+                          </span>
+                        )}
+                      </div>
 
-                    {/* Pemilih Opsi Pengolahan Ikan */}
-                    <div className="mt-3">
-                      <label className="block text-[10px] font-bold uppercase tracking-wide text-ink/60">
-                        Opsi Pengolahan:
-                      </label>
-                      <select
-                        value={currentPrep}
-                        onChange={(e) => setSelectedPrep((p) => ({ ...p, [item.id]: e.target.value }))}
-                        className="mt-1 w-full rounded-xl border border-line bg-[#EAF6F0]/45 px-2.5 py-1.5 text-xs font-semibold text-[#124E3B] outline-none"
-                      >
-                        {PREP_OPTIONS.map((opt) => (
-                          <option key={opt} value={opt}>
-                            {opt}
-                          </option>
-                        ))}
-                      </select>
+                      <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-ink/70">
+                        {item.description || 'Ikan segar budidaya lokal Kalimantan Barat, dipanen langsung saat dipesan.'}
+                      </p>
+
+                      {/* Pemilih Opsi Pengolahan Ikan */}
+                      <div className="mt-3">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[10px] font-bold uppercase tracking-wide text-ink/60">
+                            Opsi Pengolahan:
+                          </label>
+                          {cleaningFee > 0 && (
+                            <span className="text-[10px] font-semibold text-[#15803D]">
+                              +{formatRp(cleaningFee)}/kg (bersih/fillet)
+                            </span>
+                          )}
+                        </div>
+                        <select
+                          value={currentPrep}
+                          onChange={(e) => setSelectedPrep((p) => ({ ...p, [item.id]: e.target.value }))}
+                          className="mt-1 w-full rounded-xl border border-line bg-[#EAF6F0]/45 px-2.5 py-1.5 text-xs font-semibold text-[#124E3B] outline-none transition focus:border-[#15803D]"
+                        >
+                          {PREP_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.label}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="mt-4 flex items-center justify-between border-t border-line/60 pt-3">
+                  {/* Harga & Tombol Keranjang */}
+                  <div className="flex items-center justify-between border-t border-line/60 px-4 py-3">
                     <div>
                       <p className="text-[10px] font-semibold text-ink/60">Sisa kolam: {stock} kg</p>
                       <p className="text-sm font-extrabold text-[#124E3B]">
@@ -670,10 +829,11 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
 
                     <button
                       type="button"
+                      disabled={stock <= 0}
                       onClick={() => addToCart(item)}
-                      className="rounded-xl bg-[#124E3B] px-3.5 py-2 text-xs font-extrabold text-white shadow-xs transition hover:bg-[#15803D] active:scale-95"
+                      className="rounded-xl bg-[#124E3B] px-3.5 py-2 text-xs font-extrabold !text-white shadow-xs transition-all duration-200 hover:bg-[#15803D] active:scale-95 disabled:opacity-50"
                     >
-                      + Keranjang
+                      {stock > 0 ? '+ Keranjang' : 'Stok Habis'}
                     </button>
                   </div>
                 </article>
@@ -695,13 +855,13 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
               {loggedIn
                 ? isAdmin
                   ? 'Kelola stok panen kolam, harga harian, dan pesanan masuk.'
-                  : 'Pantau riwayat pesanan & pesan ulang ikan favorit lebih cepat.'
-                : 'Masuk untuk menyimpan alamat pengiriman & riwayat pesanan.'}
+                  : 'Pantau riwayat pesanan & status pengantaran langsung di web.'
+                : 'Masuk untuk membuat pesanan & memantau riwayat belanja.'}
             </p>
           </div>
           <Link
             href={dashboardHref}
-            className="shrink-0 rounded-xl bg-[#124E3B] px-3.5 py-2 text-xs font-extrabold text-white transition hover:bg-[#15803D]"
+            className="shrink-0 rounded-xl bg-[#124E3B] px-3.5 py-2 text-xs font-extrabold !text-white transition-transform duration-200 hover:scale-105 hover:bg-[#15803D]"
           >
             {loggedIn ? 'Buka Panel' : 'Masuk'}
           </Link>
@@ -709,36 +869,36 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
       </section>
 
       {/* Spacer Bawah Anti-Tabrak */}
-      <div className={cart.length > 0 ? "h-44" : "h-28"} aria-hidden="true" />
+      <div className={cart.length > 0 ? 'h-48' : 'h-32'} aria-hidden="true" />
 
-      {/* Floating Cart Bar */}
+      {/* Floating Cart Bar (Posisi Aman Di Atas Lingkaran Navbar) */}
       {cart.length > 0 && (
-        <div className="fixed inset-x-0 bottom-28 z-40 mx-auto max-w-md px-5 sm:max-w-3xl">
+        <div className="animate-smooth-card fixed inset-x-0 bottom-28 z-30 mx-auto max-w-md px-5 sm:max-w-3xl">
           <button
             type="button"
             onClick={() => setCartOpen(true)}
-            className="flex w-full items-center justify-between rounded-2xl bg-[#124E3B] px-4 py-3 text-white shadow-xl transition hover:bg-[#15803D]"
+            className="flex w-full items-center justify-between rounded-2xl bg-[#124E3B] px-4 py-3 !text-white shadow-xl transition-all duration-200 hover:bg-[#15803D] active:scale-[0.99]"
           >
             <div className="text-left">
               <p className="text-[11px] font-semibold text-[#EAF6F0]">
                 {cart.length} jenis ikan • Total {totalKg} kg
               </p>
-              <p className="text-sm font-extrabold">{formatRp(totalPrice)}</p>
+              <p className="text-sm font-extrabold !text-white">{formatRp(totalPrice)}</p>
             </div>
-            <span className="rounded-xl bg-white px-3 py-1.5 text-xs font-extrabold text-[#124E3B]">
-              Lanjut Pesan →
+            <span className="rounded-xl bg-white px-3.5 py-1.5 text-xs font-extrabold !text-[#124E3B]">
+              Checkout Web →
             </span>
           </button>
         </div>
       )}
 
-      {/* Bottom Sheet Checkout Drawer */}
+      {/* Bottom Sheet Checkout Langsung Di Web (Supabase Orders) */}
       {cartOpen && (
         <div className="fixed inset-0 z-50 flex items-end justify-center">
-          <div onClick={() => setCartOpen(false)} className="fixed inset-0 bg-black/45 backdrop-blur-[2px]" />
-          <div className="relative z-10 max-h-[86vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl">
+          <div onClick={() => setCartOpen(false)} className="fixed inset-0 bg-black/50 backdrop-blur-[2px] transition-opacity" />
+          <div className="animate-sheet-up relative z-10 max-h-[88vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl">
             <div className="flex items-center justify-between border-b border-line pb-3">
-              <h3 className="text-base font-extrabold text-ink">Keranjang Panen Segar</h3>
+              <h3 className="text-base font-extrabold text-ink">Ringkasan Pesanan</h3>
               <button
                 type="button"
                 onClick={() => setCartOpen(false)}
@@ -748,116 +908,172 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
               </button>
             </div>
 
-            <div className="mt-3 space-y-2.5">
-              {cart.map((c) => (
-                <div key={c.key} className="flex items-center justify-between rounded-2xl border border-line/70 p-3">
-                  <div>
-                    <p className="text-xs font-extrabold text-ink">{c.name}</p>
-                    <p className="text-[11px] font-semibold text-[#15803D]">Opsi: {c.prep}</p>
-                    <p className="mt-0.5 text-xs font-bold text-ink/80">{formatRp(c.qty * c.price)}</p>
+            {orderFeedback && (
+              <div
+                className={`mt-3 rounded-2xl px-3.5 py-2.5 text-xs font-bold ${
+                  orderFeedback.type === 'ok'
+                    ? 'bg-[#EAF6F0] text-[#124E3B]'
+                    : 'bg-red-500/15 text-red-500'
+                }`}
+              >
+                {orderFeedback.text}
+              </div>
+            )}
+
+            {cart.length === 0 && !orderFeedback ? (
+              <div className="py-10 text-center">
+                <p className="text-sm font-extrabold text-ink">Keranjang masih kosong</p>
+                <p className="mt-1 text-xs text-ink/60">Pilih ikan segar di katalog untuk mulai memesan.</p>
+              </div>
+            ) : (
+              <>
+                <div className="mt-3 space-y-2.5">
+                  {cart.map((c) => {
+                    const line = calcCartLine(c)
+                    return (
+                      <div key={c.key} className="flex items-center justify-between rounded-2xl border border-line/70 p-3">
+                        <div>
+                          <p className="text-xs font-extrabold text-ink">{c.name}</p>
+                          <p className="text-[11px] font-semibold text-[#15803D]">
+                            {c.prep}
+                            {line.isWholesale ? ' • Harga Grosir' : ''}
+                            {line.cleaningFee > 0 ? ` (+${formatRp(line.cleaningFee)}/kg)` : ''}
+                          </p>
+                          <p className="mt-0.5 text-xs font-bold text-ink/80">{formatRp(line.subtotal)}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => updateCartQty(c.key, -0.5)}
+                            className="flex h-7 w-7 items-center justify-center rounded-lg bg-stone-100 text-sm font-extrabold transition active:scale-90"
+                          >
+                            -
+                          </button>
+                          <span className="min-w-[44px] text-center text-xs font-extrabold">{c.qty} kg</span>
+                          <button
+                            type="button"
+                            onClick={() => updateCartQty(c.key, 0.5)}
+                            className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#EAF6F0] text-sm font-extrabold text-[#124E3B] transition active:scale-90"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+
+                <div className="mt-4 space-y-3 border-t border-line pt-3 text-xs">
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <div>
+                      <label className="font-bold text-ink">Jadwal Panen:</label>
+                      <select
+                        value={harvestSlot}
+                        onChange={(e) => setHarvestSlot(e.target.value)}
+                        className="mt-1 w-full rounded-xl border border-line bg-white px-2.5 py-2 font-semibold"
+                      >
+                        <option>Panen Pagi (06.00–09.00)</option>
+                        <option>Panen Sore (15.00–18.00)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-ink">Metode Pembayaran:</label>
+                      <select
+                        value={paymentMethod}
+                        onChange={(e) => setPaymentMethod(e.target.value as 'cod' | 'transfer')}
+                        className="mt-1 w-full rounded-xl border border-line bg-white px-2.5 py-2 font-semibold"
+                      >
+                        <option value="cod">Bayar di Tempat (COD)</option>
+                        <option value="transfer">Transfer Bank / QRIS</option>
+                      </select>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => updateCartQty(c.key, -0.5)}
-                      className="flex h-7 w-7 items-center justify-center rounded-lg bg-stone-100 text-sm font-extrabold"
+
+                  <div>
+                    <label className="font-bold text-ink">Pengambilan / Pengantaran:</label>
+                    <select
+                      value={deliveryMethod}
+                      onChange={(e) => setDeliveryMethod(e.target.value)}
+                      className="mt-1 w-full rounded-xl border border-line bg-white px-3 py-2 font-semibold"
                     >
-                      -
-                    </button>
-                    <span className="min-w-[44px] text-center text-xs font-extrabold">{c.qty} kg</span>
-                    <button
-                      type="button"
-                      onClick={() => updateCartQty(c.key, 0.5)}
-                      className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#EAF6F0] text-sm font-extrabold text-[#124E3B]"
-                    >
-                      +
-                    </button>
+                      <option>Kurir Lokal (Oksigen / Coolbox)</option>
+                      <option>Ambil Sendiri di Kolam</option>
+                    </select>
+                  </div>
+
+                  {!deliveryMethod.includes('Ambil Sendiri') && (
+                    <div>
+                      <label className="font-bold text-ink">Alamat Lengkap Pengantaran:</label>
+                      <input
+                        type="text"
+                        value={deliveryAddress}
+                        onChange={(e) => setDeliveryAddress(e.target.value)}
+                        placeholder="Jalan, nomor rumah, kelurahan / patokan..."
+                        className="mt-1 w-full rounded-xl border border-line px-3 py-2"
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="font-bold text-ink">Catatan Tambahan (Opsional):</label>
+                    <input
+                      type="text"
+                      value={buyerNote}
+                      onChange={(e) => setBuyerNote(e.target.value)}
+                      placeholder="Contoh: minta ukuran sedang, pisah kantong..."
+                      className="mt-1 w-full rounded-xl border border-line px-3 py-2"
+                    />
                   </div>
                 </div>
-              ))}
-            </div>
 
-            <div className="mt-4 space-y-3 border-t border-line pt-3 text-xs">
-              <div>
-                <label className="font-bold text-ink">Jadwal Panen:</label>
-                <select
-                  value={harvestSlot}
-                  onChange={(e) => setHarvestSlot(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-line bg-white px-3 py-2 font-semibold"
-                >
-                  <option>Panen Pagi (06.00–09.00)</option>
-                  <option>Panen Sore (15.00–18.00)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="font-bold text-ink">Metode Pengambilan / Kirim:</label>
-                <select
-                  value={deliveryMethod}
-                  onChange={(e) => setDeliveryMethod(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-line bg-white px-3 py-2 font-semibold"
-                >
-                  <option>Kurir Lokal (Oksigen / Coolbox)</option>
-                  <option>Ambil Sendiri di Kolam</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="font-bold text-ink">Catatan Tambahan (Opsional):</label>
-                <input
-                  type="text"
-                  value={buyerNote}
-                  onChange={(e) => setBuyerNote(e.target.value)}
-                  placeholder="Contoh: minta ukuran sedang, pisah kantong..."
-                  className="mt-1 w-full rounded-xl border border-line px-3 py-2"
-                />
-              </div>
-            </div>
-
-            <div className="mt-4 flex items-center justify-between border-t border-line pt-3">
-              <div>
-                <p className="text-[11px] text-ink/65">Total ({totalKg} kg)</p>
-                <p className="text-base font-extrabold text-[#124E3B]">{formatRp(totalPrice)}</p>
-              </div>
-              <button
-                type="button"
-                onClick={handleCheckoutWhatsApp}
-                className="rounded-2xl bg-[#15803D] px-4 py-3 text-xs font-extrabold text-white shadow-md transition hover:bg-[#124E3B]"
-              >
-                Kirim Pesanan via WhatsApp
-              </button>
-            </div>
+                <div className="mt-4 flex items-center justify-between border-t border-line pt-3">
+                  <div>
+                    <p className="text-[11px] text-ink/65">Total ({totalKg} kg)</p>
+                    <p className="text-base font-extrabold text-[#124E3B]">{formatRp(totalPrice)}</p>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={submitting || cart.length === 0}
+                    onClick={handleCheckoutWeb}
+                    className="rounded-2xl bg-[#124E3B] px-5 py-3 text-xs font-extrabold !text-white shadow-md transition-all duration-200 hover:bg-[#15803D] active:scale-95 disabled:opacity-50"
+                  >
+                    {submitting ? 'Menyimpan...' : 'Buat Pesanan Sekarang'}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
 
-      {/* Floating Active-Circle Bottom Navigation Bar */}
+      {/* Floating Active-Circle Bottom Navigation Bar Dengan Transisi Spring */}
       <nav className="fixed inset-x-0 bottom-3 z-40 mx-auto max-w-md px-4 sm:max-w-3xl">
-        <div className="relative rounded-[28px] border border-line/80 bg-white px-2 pb-3 pt-2 shadow-[0_10px_30px_rgba(18,78,59,0.12)]">
+        <div className="relative rounded-[28px] border border-line/80 bg-white px-2 pb-3 pt-2 shadow-[0_10px_30px_rgba(18,78,59,0.14)]">
           <div className="grid grid-cols-5 items-end">
             {/* Tab 1: Beranda */}
             <button
               type="button"
               onClick={() => {
-                setActiveNav("home")
+                setActiveNav('home')
                 setShowSearch(false)
-                setTab("all")
-                window.scrollTo({ top: 0, behavior: "smooth" })
+                setTab('all')
+                window.scrollTo({ top: 0, behavior: 'smooth' })
               }}
               className="group relative flex flex-col items-center justify-end"
             >
               <div
-                className={`flex items-center justify-center transition-all duration-300 ${
-                  activeNav === "home"
-                    ? "-mt-8 h-14 w-14 rounded-full border-[4px] border-[#124E3B] bg-white text-[#124E3B] shadow-lg"
-                    : "h-9 w-9 text-ink/45 group-hover:text-[#124E3B]"
+                className={`spring-nav-bubble flex items-center justify-center ${
+                  activeNav === 'home'
+                    ? '-translate-y-4 h-13 w-13 rounded-full border-[4px] border-[#124E3B] bg-white text-[#124E3B] shadow-lg'
+                    : 'translate-y-0 h-9 w-9 text-ink/45 group-hover:text-[#124E3B]'
                 }`}
               >
-                <NavSvg name="home" active={activeNav === "home"} />
+                <NavSvg name="home" active={activeNav === 'home'} />
               </div>
               <span
-                className={`mt-1 text-[11px] transition-colors ${
-                  activeNav === "home" ? "font-extrabold text-ink" : "font-medium text-ink/45"
+                className={`mt-1 text-[11px] transition-colors duration-200 ${
+                  activeNav === 'home' ? 'font-extrabold text-ink' : 'font-medium text-ink/45'
                 }`}
               >
                 Beranda
@@ -868,24 +1084,24 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
             <button
               type="button"
               onClick={() => {
-                setActiveNav("search")
+                setActiveNav('search')
                 setShowSearch(true)
-                document.getElementById("katalog-ikan")?.scrollIntoView({ behavior: "smooth" })
+                document.getElementById('katalog-ikan')?.scrollIntoView({ behavior: 'smooth' })
               }}
               className="group relative flex flex-col items-center justify-end"
             >
               <div
-                className={`flex items-center justify-center transition-all duration-300 ${
-                  activeNav === "search"
-                    ? "-mt-7 h-13 w-13 rounded-full border-4 border-[#124E3B] bg-white text-[#124E3B] shadow-md"
-                    : "h-9 w-9 text-ink/45 group-hover:text-[#124E3B]"
+                className={`spring-nav-bubble flex items-center justify-center ${
+                  activeNav === 'search'
+                    ? '-translate-y-4 h-13 w-13 rounded-full border-[4px] border-[#124E3B] bg-white text-[#124E3B] shadow-lg'
+                    : 'translate-y-0 h-9 w-9 text-ink/45 group-hover:text-[#124E3B]'
                 }`}
               >
-                <NavSvg name="search" active={activeNav === "search"} />
+                <NavSvg name="search" active={activeNav === 'search'} />
               </div>
               <span
-                className={`mt-1 text-[11px] transition-colors ${
-                  activeNav === "search" ? "font-extrabold text-ink" : "font-medium text-ink/45"
+                className={`mt-1 text-[11px] transition-colors duration-200 ${
+                  activeNav === 'search' ? 'font-extrabold text-ink' : 'font-medium text-ink/45'
                 }`}
               >
                 Cari
@@ -896,29 +1112,29 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
             <button
               type="button"
               onClick={() => {
-                setActiveNav("cart")
+                setActiveNav('cart')
                 setCartOpen(true)
               }}
               aria-label="Keranjang"
               className="group relative flex flex-col items-center justify-end"
             >
               <div
-                className={`relative flex items-center justify-center transition-all duration-300 ${
-                  activeNav === "cart"
-                    ? "-mt-7 h-13 w-13 rounded-full border-4 border-[#124E3B] bg-white text-[#124E3B] shadow-md"
-                    : "h-9 w-9 text-ink/45 group-hover:text-[#124E3B]"
+                className={`spring-nav-bubble relative flex items-center justify-center ${
+                  activeNav === 'cart'
+                    ? '-translate-y-4 h-13 w-13 rounded-full border-[4px] border-[#124E3B] bg-white text-[#124E3B] shadow-lg'
+                    : 'translate-y-0 h-9 w-9 text-ink/45 group-hover:text-[#124E3B]'
                 }`}
               >
-                <NavSvg name="cart" active={activeNav === "cart"} />
+                <NavSvg name="cart" active={activeNav === 'cart'} />
                 {cart.length > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#15803D] px-1 text-[9px] font-extrabold text-white">
+                  <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#15803D] px-1 text-[9px] font-extrabold !text-white">
                     {cart.length}
                   </span>
                 )}
               </div>
               <span
-                className={`mt-1 text-[11px] transition-colors ${
-                  activeNav === "cart" ? "font-extrabold text-ink" : "font-medium text-ink/45"
+                className={`mt-1 text-[11px] transition-colors duration-200 ${
+                  activeNav === 'cart' ? 'font-extrabold text-ink' : 'font-medium text-ink/45'
                 }`}
               >
                 Keranjang
@@ -928,21 +1144,21 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
             {/* Tab 4: Pesanan */}
             <Link
               href={dashboardHref}
-              onClick={() => setActiveNav("orders")}
+              onClick={() => setActiveNav('orders')}
               className="group relative flex flex-col items-center justify-end"
             >
               <div
-                className={`flex items-center justify-center transition-all duration-300 ${
-                  activeNav === "orders"
-                    ? "-mt-7 h-13 w-13 rounded-full border-4 border-[#124E3B] bg-white text-[#124E3B] shadow-md"
-                    : "h-9 w-9 text-ink/45 group-hover:text-[#124E3B]"
+                className={`spring-nav-bubble flex items-center justify-center ${
+                  activeNav === 'orders'
+                    ? '-translate-y-4 h-13 w-13 rounded-full border-[4px] border-[#124E3B] bg-white text-[#124E3B] shadow-lg'
+                    : 'translate-y-0 h-9 w-9 text-ink/45 group-hover:text-[#124E3B]'
                 }`}
               >
-                <NavSvg name="orders" active={activeNav === "orders"} />
+                <NavSvg name="orders" active={activeNav === 'orders'} />
               </div>
               <span
-                className={`mt-1 text-[11px] transition-colors ${
-                  activeNav === "orders" ? "font-extrabold text-ink" : "font-medium text-ink/45"
+                className={`mt-1 text-[11px] transition-colors duration-200 ${
+                  activeNav === 'orders' ? 'font-extrabold text-ink' : 'font-medium text-ink/45'
                 }`}
               >
                 Pesanan
@@ -952,21 +1168,21 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
             {/* Tab 5: Profil / Role */}
             <Link
               href={dashboardHref}
-              onClick={() => setActiveNav("profile")}
+              onClick={() => setActiveNav('profile')}
               className="group relative flex flex-col items-center justify-end"
             >
               <div
-                className={`flex items-center justify-center transition-all duration-300 ${
-                  activeNav === "profile"
-                    ? "-mt-7 h-13 w-13 rounded-full border-4 border-[#124E3B] bg-white text-[#124E3B] shadow-md"
-                    : "h-9 w-9 text-ink/45 group-hover:text-[#124E3B]"
+                className={`spring-nav-bubble flex items-center justify-center ${
+                  activeNav === 'profile'
+                    ? '-translate-y-4 h-13 w-13 rounded-full border-[4px] border-[#124E3B] bg-white text-[#124E3B] shadow-lg'
+                    : 'translate-y-0 h-9 w-9 text-ink/45 group-hover:text-[#124E3B]'
                 }`}
               >
-                <NavSvg name="profile" active={activeNav === "profile"} />
+                <NavSvg name="profile" active={activeNav === 'profile'} />
               </div>
               <span
-                className={`mt-1 text-[11px] transition-colors ${
-                  activeNav === "profile" ? "font-extrabold text-ink" : "font-medium text-ink/45"
+                className={`mt-1 text-[11px] transition-colors duration-200 ${
+                  activeNav === 'profile' ? 'font-extrabold text-ink' : 'font-medium text-ink/45'
                 }`}
               >
                 {roleLabel}
@@ -975,7 +1191,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
           </div>
 
           {/* Home Indicator Bar Bawah */}
-          <div className="mx-auto mt-2.5 h-1 w-28 rounded-full bg-stone-300/80" />
+          <div className="mx-auto mt-2.5 h-1 w-28 rounded-full bg-stone-300/60" />
         </div>
       </nav>
     </>

@@ -66,3 +66,67 @@
 .animate-vibe-fade-up {
   animation: vibeFadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+
+
+/* === SYSTEM DARK MODE (MENGIKUTI PENGATURAN HP) & SMOOTH SPRING ANIMATIONS === */
+@keyframes smoothFadeUp {
+  0% { opacity: 0; transform: translateY(12px) scale(0.985); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes sheetSlideUp {
+  0% { opacity: 0; transform: translateY(100%); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-smooth-card {
+  animation: smoothFadeUp 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-sheet-up {
+  animation: sheetSlideUp 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.spring-nav-bubble {
+  transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1),
+              background-color 0.25s ease,
+              box-shadow 0.3s ease,
+              border-color 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+  body {
+    background-color: #0B1410 !important;
+    color: #ECFDF5 !important;
+  }
+  h1, h2, h3, h4, .text-ink {
+    color: #ECFDF5 !important;
+  }
+  .text-mute, .text-ink\/80, .text-ink\/75, .text-ink\/70, .text-ink\/65, .text-ink\/60, .text-ink\/55, .text-ink\/45 {
+    color: #9CA3AF !important;
+  }
+  .bg-white, .bg-card, .card {
+    background-color: #13211B !important;
+    border-color: rgba(52, 211, 153, 0.16) !important;
+  }
+  .bg-paper, .bg-\[\#F4F7F5\], .bg-stone-100 {
+    background-color: #0E1914 !important;
+  }
+  .bg-\[\#EAF6F0\], .bg-\[\#EAF6F0\]\/45 {
+    background-color: rgba(16, 185, 129, 0.14) !important;
+  }
+  .text-\[\#124E3B\] {
+    color: #6EE7B7 !important;
+  }
+  .border-line, .border-line\/80, .border-line\/75, .border-line\/70, .border-line\/60 {
+    border-color: rgba(52, 211, 153, 0.16) !important;
+  }
+  input, select, textarea {
+    background-color: #0E1914 !important;
+    color: #ECFDF5 !important;
+    border-color: rgba(52, 211, 153, 0.25) !important;
+  }
+}
