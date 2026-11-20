@@ -6,7 +6,11 @@ const display = Bricolage_Grotesque({ subsets: ['latin'], variable: '--font-disp
 const body = Public_Sans({ subsets: ['latin'], variable: '--font-body', display: 'swap' })
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  metadataBase: (() => {
+    const raw = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').trim()
+    const withProto = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`
+    try { return new URL(withProto) } catch { return new URL('http://localhost:3000') }
+  })(),
   title: { default: 'Budi Daya Ikan Kalbar — Ikan Segar Langsung dari Kolam', template: '%s | Budi Daya Ikan Kalbar' },
   description: 'Beli ikan nila, lele, dan patin segar langsung dari pembudidaya di Kalimantan Barat. Pesan hidup, segar, atau bersih siap masak.',
 }
