@@ -13,8 +13,16 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!user) redirect('/login?next=/admin')
   const adminDb = createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
   const { data: profile, error: profileErr } = await adminDb.from("profiles").select("role").eq("id", user.id).single()
-  const resolvedRole = profile?.role ?? (user as any)?.user_metadata?.role ?? ((user as any)?.email === "serahna97@gmail.com" ? "admin" : null);
-  if (resolvedRole !== "admin") redirect("/dashboard")
+  const emailMatch = String((user as any)?.email ?? "").trim().toLowerCase() === "serahna97@gmail.com";
+  const resolvedRole = profile?.role ?? (user as any)?.user_metadata?.role ?? (emailMatch ? "admin" : null);
+  if (resolvedRole !== "admin") {
+    return (
+      <div className="mx-auto max-w-xl px-4 py-10">
+        <h1 className="text-lg font-bold">Akses Admin Ditolak</h1>
+        <p className="mt-2 text-sm">Role terbaca: {String(resolvedRole)} | Email: {String((user as any)?.email ?? "tidak ada")} | Profile role: {String(profile?.role ?? "null")}</p>
+      </div>
+    );
+  }
 
   return (
     <>
