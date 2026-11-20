@@ -1,3 +1,4 @@
+import { createClient as createAdminClient } from "@supabase/supabase-js"
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
@@ -27,7 +28,7 @@ export async function middleware(request: NextRequest) {
   if (protectedArea && !user) return go('/login', `?next=${encodeURIComponent(path)}`)
 
   if (user && (path.startsWith('/admin') || path === '/login' || path === '/register')) {
-    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+    const { data: profile } = await createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!,process.env.SUPABASE_SERVICE_ROLE_KEY!).from('profiles').select('role').eq('id', user.id).single()
     const isAdmin = profile?.role === 'admin'
     if (path.startsWith('/admin') && !isAdmin) return go('/dashboard')
     if (path === '/login' || path === '/register') return go(isAdmin ? '/admin' : '/dashboard')
