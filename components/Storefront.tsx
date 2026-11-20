@@ -525,7 +525,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
             <button
               type="button"
               onClick={handleSlideCta}
-              className="mt-4 rounded-full bg-white px-4 py-2 text-xs font-extrabold !text-[#124E3B] shadow-sm transition-transform duration-200 hover:scale-105 active:scale-95"
+              className="mt-4 rounded-full bg-white px-4 py-2 text-xs font-extrabold !text-[#124E3B] shadow-sm transition-transform duration-200 hover:scale-105 active:scale-95 nav-tap-btn transition duration-150"
             >
               {currentSlide.cta}
             </button>
@@ -671,7 +671,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
       )}
 
       {/* Katalog Produk Dengan Foto Ikan Proporsional */}
-      <section id="katalog-ikan" className="mt-6">
+      <section id="katalog-ikan" className="mt-6 nav-page-enter transition duration-200">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-base font-extrabold text-ink">Pilihan Segar</h2>
@@ -724,7 +724,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
                 <article
                   key={item.id}
                   style={{ animationDelay: `${idx * 55}ms` }}
-                  className="animate-smooth-card group flex flex-col justify-between overflow-hidden rounded-3xl border border-line/75 bg-white shadow-2xs transition-all duration-300 hover:-translate-y-0.5 hover:border-[#15803D]/50 hover:shadow-md"
+                  className="animate-smooth-card group flex flex-col justify-between overflow-hidden rounded-3xl border border-line/75 bg-white shadow-2xs transition-all duration-300 hover:-translate-y-0.5 hover:border-[#15803D]/50 hover:shadow-md nav-page-enter transition duration-200"
                 >
                   <div>
                     {/* Foto Ikan Proporsional di Bagian Atas Kartu */}
@@ -850,7 +850,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
       </section>
 
       {/* Kartu Info Akun Buyer / Admin */}
-      <section className="mt-6 rounded-3xl border border-[#124E3B]/15 bg-[#EAF6F0] p-4">
+      <section className="mt-6 rounded-3xl border border-[#124E3B]/15 bg-[#EAF6F0] p-4 nav-page-enter transition duration-200">
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-[#124E3B]/75">
@@ -1042,7 +1042,7 @@ export default function Storefront({ products, profile, loggedIn }: StorefrontPr
                     type="button"
                     disabled={submitting || cart.length === 0}
                     onClick={handleCheckoutWeb}
-                    className="rounded-2xl bg-[#124E3B] px-5 py-3 text-xs font-extrabold !text-white shadow-md transition-all duration-200 hover:bg-[#15803D] active:scale-95 disabled:opacity-50"
+                    className="rounded-2xl bg-[#124E3B] px-5 py-3 text-xs font-extrabold !text-white shadow-md transition-all duration-200 hover:bg-[#15803D] active:scale-95 disabled:opacity-50 nav-tap-btn transition duration-150"
                   >
                     {submitting ? 'Menyimpan...' : 'Buat Pesanan Sekarang'}
                   </button>

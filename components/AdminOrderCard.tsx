@@ -59,7 +59,7 @@ export default function AdminOrderCard({ order: o, proofUrl }: { order: Order & 
         {o.order_items.map((it) => <li key={it.id}><b>{it.products?.name}</b> · {kg(it.weight_kg)} · {PROCESSING_LABEL[it.processing_option]}</li>)}
       </ul>
       <div className="mt-2 text-sm text-mute">
-        <p>{o.profiles?.full_name}{wa && <> · <a href={wa} target="_blank" rel="noreferrer" className="font-semibold text-river">WhatsApp {o.profiles?.phone}</a></>}</p>
+        <p>{o.profiles?.full_name}{wa && <> · <a href={wa} target="_blank" rel="noreferrer" className="font-semibold text-river nav-tap-btn transition duration-150">WhatsApp {o.profiles?.phone}</a></>}</p>
         <p className="whitespace-pre-line">{o.delivery_address}</p>
         {o.delivery_notes && <p>Catatan: {o.delivery_notes}</p>}
       </div>
@@ -67,16 +67,16 @@ export default function AdminOrderCard({ order: o, proofUrl }: { order: Order & 
       {error && <p role="alert" className="mt-3 rounded-xl bg-merah-soft px-3 py-2 text-sm text-merah">{error}</p>}
 
       <div className="mt-4 flex flex-wrap gap-2">
-        {proofUrl && <button className="btn-outline" onClick={() => setShowProof(true)}>Lihat Bukti Bayar</button>}
+        {proofUrl && <button className="btn-outline nav-tap-btn transition duration-150" onClick={() => setShowProof(true)}>Lihat Bukti Bayar</button>}
         {o.payment_method === 'transfer' && o.payment_status !== 'paid' && o.order_status !== 'cancelled' && (
-          <button className="btn-outline" disabled={pending || o.payment_status !== 'verifying'} title={o.payment_status !== 'verifying' ? 'Menunggu bukti bayar dari pembeli' : undefined}
+          <button className="btn-outline nav-tap-btn transition duration-150" disabled={pending || o.payment_status !== 'verifying'} title={o.payment_status !== 'verifying' ? 'Menunggu bukti bayar dari pembeli' : undefined}
             onClick={() => run(() => verifyPaidAction(o.id))}>Verifikasi Lunas</button>
         )}
         {ADVANCE_LABEL[o.order_status] && (
-          <button className="btn-primary" disabled={pending} onClick={() => run(() => advanceOrderAction(o.id))}>{ADVANCE_LABEL[o.order_status]}</button>
+          <button className="btn-primary nav-tap-btn transition duration-150" disabled={pending} onClick={() => run(() => advanceOrderAction(o.id))}>{ADVANCE_LABEL[o.order_status]}</button>
         )}
         {open && (
-          <button className="btn-danger ml-auto" disabled={pending}
+          <button className="btn-danger ml-auto nav-tap-btn transition duration-150" disabled={pending}
             onClick={() => { if (confirm(`Batalkan pesanan ${o.invoice_code}? Stok akan dikembalikan.`)) run(() => adminCancelOrderAction(o.id)) }}>Batalkan Pesanan</button>
         )}
       </div>
@@ -88,8 +88,8 @@ export default function AdminOrderCard({ order: o, proofUrl }: { order: Order & 
             <img src={proofUrl} alt={`Bukti pembayaran ${o.invoice_code}`} className="w-full rounded-xl border border-line" />
             <p className="mt-3 text-sm">Nominal pesanan: <b>{rupiah(o.total_amount)}</b></p>
             <div className="mt-3 flex gap-2">
-              {o.payment_status !== 'paid' && <button className="btn-primary flex-1" disabled={pending} onClick={() => { run(() => verifyPaidAction(o.id)); setShowProof(false) }}>Verifikasi Lunas</button>}
-              <button className="btn-outline flex-1" onClick={() => setShowProof(false)}>Tutup</button>
+              {o.payment_status !== 'paid' && <button className="btn-primary flex-1 nav-tap-btn transition duration-150" disabled={pending} onClick={() => { run(() => verifyPaidAction(o.id)); setShowProof(false) }}>Verifikasi Lunas</button>}
+              <button className="btn-outline flex-1 nav-tap-btn transition duration-150" onClick={() => setShowProof(false)}>Tutup</button>
             </div>
           </div>
         </div>
